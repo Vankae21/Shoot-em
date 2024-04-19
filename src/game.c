@@ -11,7 +11,7 @@
 Player* player = (void*)0;
 Weapon* weapon = (void*)0;
 
-unsigned int ENEMY_COUNT = 5;
+unsigned int ENEMY_COUNT = 3;
 Enemy* enemies[0];
 
 void init()
@@ -102,7 +102,6 @@ void update()
 			enemies[i]->sprite_order = 0;
 		}
 	}
-	printf("%d\n", sizeof(Enemy));
 }
 
 void late_update()
