@@ -22,3 +22,12 @@ float vec2_distance(Vector2 vec_a, Vector2 vec_b)
 {
 	return sqrtf((vec_a.x - vec_b.x) * (vec_a.x - vec_b.x) + (vec_a.y - vec_b.y) * (vec_a.y - vec_b.y));
 }
+
+float clamp(float value, float min, float max)
+{
+	if(value > min && value < max)
+	{
+		return value;
+	}
+	return value < min ? min : max;
+}
