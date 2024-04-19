@@ -12,10 +12,14 @@ Vector2 vec2_normalize(Vector2 vec)
 
 bool is_rec_circle_colliding(Rectangle rec, Circle cir)
 {
-	return (rec.x + rec.width >= cir.center.x - cir.radius &&
-			cir.center.x + cir.radius >= rec.x &&
-			rec.y + rec.height >= cir.center.y - cir.radius &&
-			cir.center.y + cir.radius >= rec.y);
+	Vector2 test_v = { .x = clamp(cir.center.x, rec.x, rec.x + rec.width), .y = clamp(cir.center.y, rec.y, rec.y + rec.height) };
+
+	Vector2 dis = { .x = cir.center.x - test_v.x, .y = cir.center.y - test_v.y};
+
+	if(vec2_len(dis) > cir.radius)
+		return false;
+	
+	return true;
 }
 
 float vec2_distance(Vector2 vec_a, Vector2 vec_b)

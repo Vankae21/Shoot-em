@@ -11,7 +11,7 @@
 Player* player = (void*)0;
 Weapon* weapon = (void*)0;
 
-unsigned int ENEMY_COUNT = 6;
+unsigned int ENEMY_COUNT = 5;
 Enemy* enemies[0];
 
 void init()
@@ -20,7 +20,6 @@ void init()
 
 	player = init_player((Vector2){ 400, 300 }, (Vector2){ 64, 64 }, 300, 100);
 	weapon = init_weapon((Circle){ .center = (Vector2){ 200, 200 }, .radius = 24 }, 128, 16, 2.5f, 10);
-	//enemy = init_enemy((Vector2){ 0, 80 }, (Vector2){ 64, 96 }, 40, 15, 100);
 
 	for(int i = 0; i < ENEMY_COUNT; i++)
 	{
@@ -35,6 +34,7 @@ void update()
 
 	if(!weapon->is_picked_up && is_rec_circle_colliding(get_player_rec(player), weapon->cir))
 	{
+		DrawText("Press E to pick up", weapon->cir.center.x - weapon->cir.radius, weapon->cir.center.y - weapon->cir.radius - 32, 32, BLACK);
 		if(IsKeyPressed(KEY_E))
 		{
 			weapon->is_picked_up = true;
@@ -49,7 +49,7 @@ void update()
 		update_bullet(weapon->bullets[i]);
 	}
 
-	Vector2 dest = { .x = player->pos.x + player->size.x/2, .y = player->pos.y + player->size.y/2 };
+	Vector2 player_dest = { .x = player->pos.x + player->size.x/2, .y = player->pos.y + player->size.y/2 };
 
 	for(int i = 0; i < ENEMY_COUNT; i++)
 	{
@@ -75,9 +75,9 @@ void update()
 
 		Vector2 enemy_mid = { .x = enemies[i]->pos.x + enemies[i]->size.x/2, .y = enemies[i]->pos.y + enemies[i]->size.y/2 };
 
-		if(vec2_distance(dest, enemy_mid) > 32)
+		if(vec2_distance(player_dest, enemy_mid) > 32)
 		{
-			enemies[i]->dir = vec2_normalize((Vector2){ dest.x - enemy_mid.x, dest.y - enemy_mid.y });
+			enemies[i]->dir = vec2_normalize((Vector2){ player_dest.x - enemy_mid.x, player_dest.y - enemy_mid.y });
 
 			//enemy->pos.x = player->pos.x + player->size.x/2 - enemy->size.x/2;
 			//enemy->pos.y = player->pos.y + player->size.y/2 - enemy->size.y/2;
@@ -93,7 +93,7 @@ void update()
 		}
 		update_enemy(enemies[i]);
 
-		if(enemy_mid.y > player->pos.y + player->size.y/2)
+		if(enemy_mid.y > player_dest.y)
 		{
 			enemies[i]->sprite_order = 2;
 		}
@@ -102,6 +102,7 @@ void update()
 			enemies[i]->sprite_order = 0;
 		}
 	}
+	printf("%d\n", sizeof(Enemy));
 }
 
 void late_update()
