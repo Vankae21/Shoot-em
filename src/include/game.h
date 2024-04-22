@@ -5,10 +5,13 @@
 #define HEIGHT 600
 #define TITLE "GEYM"
 #define FPS 60
+#define DEBUG 0
+extern unsigned int ENEMY_COUNT;
 
 void init();
 void update();
 void late_update();
+void draw_ui();
 void finish();
 
 #endif

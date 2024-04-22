@@ -3,6 +3,9 @@
 
 int main(int argc, char** argv)
 {
+	if(argc > 1)
+		ENEMY_COUNT = argv[1][0] - 48;
+
 	InitWindow(WIDTH, HEIGHT, TITLE);
 	SetTargetFPS(FPS);
 
@@ -12,8 +15,9 @@ int main(int argc, char** argv)
 	{
 		update();
 		BeginDrawing();
-		ClearBackground(RAYWHITE);
+		ClearBackground((Color){100, 100, 100, 255});
 		late_update();
+		draw_ui();
 		EndDrawing();
 	}
 

@@ -11,20 +11,20 @@
 Player* player = (void*)0;
 Weapon* weapon = (void*)0;
 
-unsigned int ENEMY_COUNT = 3;
+unsigned int ENEMY_COUNT;
 Enemy* enemies[0];
 
 void init()
 {
 	srand(time(0));
 
-	player = init_player((Vector2){ 400, 300 }, (Vector2){ 64, 64 }, 300, 100);
-	weapon = init_weapon((Circle){ .center = (Vector2){ 200, 200 }, .radius = 24 }, 128, 16, 2.5f, 10);
+	player = init_player((Vector2){ 400, 300 }, (Vector2){ 64, 64 }, 300, 100, "assets/player.png");
+	weapon = init_weapon((Circle){ .center = (Vector2){ 200, 200 }, .radius = 16 }, 128, 16, 2.5f, 10, "assets/weapon.png");
 
 	for(int i = 0; i < ENEMY_COUNT; i++)
 	{
 		enemies[i] = init_enemy((Vector2){ .x = rand() % WIDTH, .y = rand() % HEIGHT }, (Vector2){ .x = 64, .y = 64 },
-											50, 40, rand() % 50 + 25 );
+											50, 40, rand() % 50 + 25 , "assets/zombie.png");
 	}
 }
 
@@ -50,6 +50,9 @@ void update()
 	}
 
 	Vector2 player_dest = { .x = player->pos.x + player->size.x/2, .y = player->pos.y + player->size.y/2 };
+
+	// CHECK IF PLAYER IS TAKING DAMAGE
+	bool player_is_taking_dmg = false;
 
 	for(int i = 0; i < ENEMY_COUNT; i++)
 	{
@@ -89,6 +92,7 @@ void update()
 
 		if(CheckCollisionRecs(get_player_rec(player), get_enemy_rec(enemies[i])))
 		{
+			player_is_taking_dmg = true;
 			player->cur_hp -= enemies[i]->damage * GetFrameTime();
 		}
 		update_enemy(enemies[i]);
@@ -102,6 +106,9 @@ void update()
 			enemies[i]->sprite_order = 0;
 		}
 	}
+
+	// ASSIGN TO PLAYER EVERYTIME
+	player->is_taking_damage = player_is_taking_dmg;
 }
 
 void late_update()
@@ -120,8 +127,14 @@ void late_update()
 		}
 	}
 	draw_weapon(weapon);
+}
 
+void draw_ui()
+{
 	//UI
+	
+	// PLAYER DMG SCR
+	DrawRectangle(0, 0, WIDTH, HEIGHT, player->dmg_color);
 
 	//player hp
 	Rectangle pl_hp_bar = { .x = 16, .y = 16, .width = 192, .height = 32 };

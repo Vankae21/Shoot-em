@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-Weapon* init_weapon(Circle cir, unsigned int bullet_count, unsigned int max_ammo, float reload_time, float damage)
+Weapon* init_weapon(Circle cir, unsigned int bullet_count, unsigned int max_ammo, float reload_time, float damage, const char* tex_path)
 {
 	Weapon* weapon = calloc(1, sizeof(Weapon));
 
@@ -13,13 +13,14 @@ Weapon* init_weapon(Circle cir, unsigned int bullet_count, unsigned int max_ammo
 	weapon->cir = cir;
 	weapon->dir = (Vector2){ 0, 0 };
 	weapon->bullet_count = bullet_count;
-	weapon->bullets = init_bullets(bullet_count, 700, 16);
+	weapon->bullets = init_bullets(bullet_count, 700, 8);
 	weapon->max_ammo = max_ammo;
 	weapon->cur_ammo = max_ammo;
 	weapon->is_reloading = false;
 	weapon->reload_time = reload_time;
 	weapon->cur_reload_time = 0;
 	weapon->damage = damage;
+	weapon->tex = LoadTexture(tex_path);
 
 	return weapon;
 }
@@ -67,7 +68,17 @@ void update_weapon(Weapon* weapon)
 
 void draw_weapon(Weapon* weapon)
 {
+	if(DEBUG)
 	DrawCircleV(weapon->cir.center, weapon->cir.radius, BROWN);
+
+
+	float degree = atan2f(weapon->dir.y, weapon->dir.x) * RAD2DEG;
+	float ty_mltp = fabs(degree) > 90 ? -1 : 1;
+
+	DrawTexturePro(weapon->tex, (Rectangle){ .x = 0, .y = 0, .width = weapon->tex.width, .height = weapon->tex.height * ty_mltp },
+					(Rectangle){ .x = weapon->cir.center.x, .y = weapon->cir.center.y,
+					 			.width = weapon->cir.radius * 2, .height = weapon->cir.radius * 2 },
+					(Vector2){ weapon->cir.radius, weapon->cir.radius }, degree, WHITE);
 
 	for(int i = 0; i < weapon->bullet_count; i++)
 	{

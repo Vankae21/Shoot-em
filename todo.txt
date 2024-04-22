@@ -1,0 +1,4 @@
+make weapon texture work V
+make bullet texture and get it work
+make bullets unactive if they aren't collided with anything for a while
+make smooth moving camera
