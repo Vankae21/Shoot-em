@@ -81,6 +81,7 @@ void update_player(Player* player)
 			player->cur_wpn->is_picked_up = false;
 			player->cur_wpn->cur_reload_time = 0;
 			player->cur_wpn->is_reloading = false;
+			player->cur_wpn->dir = (Vector2){ 0 };
 			player->cur_wpn = (void*)0;
 		}
 	}
