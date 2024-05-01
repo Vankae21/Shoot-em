@@ -1,6 +1,6 @@
 #include "include/player.h"
 #include "include/game.h"
-#include "include/utils.h"
+#include "include/vutils.h"
 #include "include/weapon.h"
 #include <raylib.h>
 #include <stdlib.h>
@@ -56,7 +56,8 @@ void update_player(Player* player)
 
 	if(player->cur_wpn)
 	{
-		Vector2 pointer = { .x = GetMouseX() - player->pos.x - player->size.x/2, .y = GetMouseY() - player->pos.y - player->size.y/2 };
+		Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), *camera);
+		Vector2 pointer = { .x = mousePos.x - player->pos.x - player->size.x/2, .y = mousePos.y - player->pos.y - player->size.y/2 };
 		Vector2 pointer_dir = vec2_normalize(pointer);
 
 		if(pointer_dir.x > 0)

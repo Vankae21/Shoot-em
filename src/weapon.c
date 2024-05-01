@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-Weapon* init_weapon(Circle cir, unsigned int bullet_count, unsigned int max_ammo, float reload_time, float damage, const char* tex_path)
+Weapon* init_weapon(Circle cir, unsigned int bullet_count, unsigned int max_ammo, float reload_time, float damage, const char* tex_path, const char* bullet_tex_path)
 {
 	Weapon* weapon = calloc(1, sizeof(Weapon));
 
@@ -13,7 +13,7 @@ Weapon* init_weapon(Circle cir, unsigned int bullet_count, unsigned int max_ammo
 	weapon->cir = cir;
 	weapon->dir = (Vector2){ 0, 0 };
 	weapon->bullet_count = bullet_count;
-	weapon->bullets = init_bullets(bullet_count, 700, 8);
+	weapon->bullets = init_bullets(bullet_count, 1000, 8);
 	weapon->max_ammo = max_ammo;
 	weapon->cur_ammo = max_ammo;
 	weapon->is_reloading = false;
@@ -21,6 +21,7 @@ Weapon* init_weapon(Circle cir, unsigned int bullet_count, unsigned int max_ammo
 	weapon->cur_reload_time = 0;
 	weapon->damage = damage;
 	weapon->tex = LoadTexture(tex_path);
+	weapon->bullet_tex = LoadTexture(bullet_tex_path);
 
 	return weapon;
 }
@@ -84,7 +85,7 @@ void draw_weapon(Weapon* weapon)
 	{
 		if(!weapon->bullets[i]->is_active) continue;
 
-		draw_bullet(weapon->bullets[i]);
+		draw_bullet(weapon->bullets[i], weapon->bullet_tex);
 	}
 	if(weapon->is_reloading)
 	{

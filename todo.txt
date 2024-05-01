@@ -1,4 +1,9 @@
 make weapon texture work V
-make bullet texture and get it work
-make bullets unactive if they aren't collided with anything for a while
-make smooth moving camera
+make bullet texture and get it work V
+make bullets unactive if they aren't collided with anything for a while V
+make smooth moving camera V
+make coins
+show coins amount on ui
+make coins dropped from enemies
+make coins animated when they are on ground
+realloc coins array when new coins dropped

@@ -2,7 +2,7 @@
 #define WEAPON_H
 
 #include "bullet.h"
-#include "utils.h"
+#include "vutils.h"
 #include <raylib.h>
 
 typedef struct
@@ -19,9 +19,10 @@ typedef struct
 	float cur_reload_time;
 	float damage;
 	Texture2D tex;
+	Texture2D bullet_tex;
 } Weapon;
 
-Weapon* init_weapon(Circle cir, unsigned int bullet_count, unsigned int max_ammo, float reload_time, float damage, const char* tex_path);
+Weapon* init_weapon(Circle cir, unsigned int bullet_count, unsigned int max_ammo, float reload_time, float damage, const char* tex_path, const char* bullet_tex_path);
 void update_weapon(Weapon* weapon);
 void draw_weapon(Weapon* weapon);
 

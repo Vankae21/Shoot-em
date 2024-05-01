@@ -1,8 +1,10 @@
 #ifndef ENEMY_H
 #define ENEMY_H
 
-#include "utils.h"
+#include "vutils.h"
 #include <raylib.h>
+
+#define ENEMY_MAX_COIN_DROP 3
 
 typedef struct
 {

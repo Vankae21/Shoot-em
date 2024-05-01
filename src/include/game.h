@@ -1,12 +1,16 @@
 #ifndef GAME_H
 #define GAME_H
 
-#define WIDTH 800
-#define HEIGHT 600
+#include <raylib.h>
+
+#define WIDTH 1280
+#define HEIGHT 720
 #define TITLE "GEYM"
 #define FPS 60
-#define DEBUG 1
+#define DEBUG 0
+#define SIZE_MULTIPLIER 2
 extern unsigned int ENEMY_COUNT;
+extern Camera2D* camera;
 
 void init();
 void update();

@@ -1,4 +1,4 @@
-#include "include/utils.h"
+#include "include/vutils.h"
 
 float vec2_len(Vector2 vec)
 {
@@ -34,4 +34,10 @@ float clamp(float value, float min, float max)
 		return value;
 	}
 	return value < min ? min : max;
+}
+
+Vector2 vec2_lerp(Vector2 start_vec, Vector2 end_vec, float t)
+{
+	Vector2 diff = { .x = end_vec.x - start_vec.x, .y = end_vec.y - start_vec.y };
+	return (Vector2){ .x = start_vec.x + diff.x * t * GetFrameTime(), .y = start_vec.y + diff.y * t * GetFrameTime() };
 }
