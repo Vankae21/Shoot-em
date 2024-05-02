@@ -8,7 +8,8 @@ typedef struct
 {
     enum
     {
-        COIN
+        COIN,
+        MEDKIT
     } type;
     Circle cir;
     bool is_collected;

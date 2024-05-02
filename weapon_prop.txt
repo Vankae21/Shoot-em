@@ -1,0 +1,5 @@
+PISTOL:
+    Bullet count: 32
+    Max ammo: 16
+    Reload time: 2.5f
+    Damage: 10

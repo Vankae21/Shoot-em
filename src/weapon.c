@@ -5,22 +5,29 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-Weapon* init_weapon(Circle cir, unsigned int bullet_count, unsigned int max_ammo, float reload_time, float damage, const char* tex_path, const char* bullet_tex_path)
+Weapon* init_weapon(unsigned short type, Vector2 pos, const char* bullet_tex_path)
 {
 	Weapon* weapon = calloc(1, sizeof(Weapon));
 
+	// defaults
+	weapon->type = type;
 	weapon->is_picked_up = false;
-	weapon->cir = cir;
+	weapon->cir = (Circle){ .center = pos, .radius = 16 };
 	weapon->dir = (Vector2){ 0, 0 };
-	weapon->bullet_count = bullet_count;
-	weapon->bullets = init_bullets(bullet_count, 1000, 8);
-	weapon->max_ammo = max_ammo;
-	weapon->cur_ammo = max_ammo;
 	weapon->is_reloading = false;
-	weapon->reload_time = reload_time;
 	weapon->cur_reload_time = 0;
-	weapon->damage = damage;
-	weapon->tex = LoadTexture(tex_path);
+
+	switch(type)
+	{
+		case PISTOL:
+			weapon->bullet_count = 32;
+			weapon->bullets = init_bullets(weapon->bullet_count, 1000, 8);
+			weapon->max_ammo = 16;
+			weapon->reload_time = 2.5f;
+			weapon->damage = 10;
+	}
+
+	weapon->cur_ammo = weapon->max_ammo;
 	weapon->bullet_tex = LoadTexture(bullet_tex_path);
 
 	return weapon;
@@ -67,7 +74,7 @@ void update_weapon(Weapon* weapon)
 	}
 }
 
-void draw_weapon(Weapon* weapon)
+void draw_weapon(Weapon* weapon, Texture2D weapon_spsheet)
 {
 	if(DEBUG)
 	DrawCircleV(weapon->cir.center, weapon->cir.radius, BROWN);
@@ -76,7 +83,7 @@ void draw_weapon(Weapon* weapon)
 	float degree = atan2f(weapon->dir.y, weapon->dir.x) * RAD2DEG;
 	float ty_mltp = fabs(degree) > 90 ? -1 : 1;
 
-	DrawTexturePro(weapon->tex, (Rectangle){ .x = 0, .y = 0, .width = weapon->tex.width, .height = weapon->tex.height * ty_mltp },
+	DrawTexturePro(weapon_spsheet, (Rectangle){ .x = weapon->type * 16, .y = 0, .width = 16, .height = 16 * ty_mltp },
 					(Rectangle){ .x = weapon->cir.center.x, .y = weapon->cir.center.y,
 					 			.width = weapon->cir.radius * 2, .height = weapon->cir.radius * 2 },
 					(Vector2){ weapon->cir.radius, weapon->cir.radius }, degree, WHITE);

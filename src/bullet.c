@@ -13,6 +13,7 @@ Bullet** init_bullets(unsigned int count, float speed, float radius)
 	{
 		bullets[i] = calloc(1, sizeof(Bullet));
 
+		bullets[i]->type = PISTOL_BULLET;
 		bullets[i]->cir = (Circle){ .center = {0}, .radius = radius };
 		bullets[i]->speed = speed;
 		bullets[i]->dir = (Vector2){ 0, 0 };

@@ -7,6 +7,12 @@
 
 typedef struct
 {
+	enum
+	{
+		PISTOL,
+		PYROGUN
+	} type;
+
 	Circle cir;
 	bool is_picked_up;
 	Vector2 dir;
@@ -18,12 +24,11 @@ typedef struct
 	float reload_time;
 	float cur_reload_time;
 	float damage;
-	Texture2D tex;
 	Texture2D bullet_tex;
 } Weapon;
 
-Weapon* init_weapon(Circle cir, unsigned int bullet_count, unsigned int max_ammo, float reload_time, float damage, const char* tex_path, const char* bullet_tex_path);
+Weapon* init_weapon(unsigned short type, Vector2 pos, const char* bullet_tex_path);
 void update_weapon(Weapon* weapon);
-void draw_weapon(Weapon* weapon);
+void draw_weapon(Weapon* weapon, Texture2D weapon_spsheet);
 
 #endif

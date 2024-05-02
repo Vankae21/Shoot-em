@@ -9,19 +9,22 @@
 #include "include/enemy.h"
 #include "include/collectible.h"
 
-unsigned int ENEMY_COUNT = 5;
 unsigned int collected_coin = 0;
-unsigned int COIN_COUNT = 0;
+unsigned int kill_count = 0;
+unsigned int ENEMY_COUNT = 2;
+unsigned int COLLECTIBLE_COUNT = 0;
+unsigned int WEAPON_COUNT = 400;
 
 Font font;
 Texture2D bg;
 Texture2D collectible_spsheet;
+Texture2D enemies_spsheet;
+Texture2D weapon_spsheet;
 Player* player = (void*)0;
-Weapon* weapon = (void*)0;
+Weapon** weapons = (void*)0;
 Camera2D* camera = (void*)0;
-Collectible** coins = (void*)0;
-Enemy** enemies;
-
+Collectible** collectibles = (void*)0;
+Enemy** enemies = (void*)0;
 
 
 
@@ -31,20 +34,26 @@ void init()
 	// ASSETS
 	font = LoadFontEx("assets/JOYSTIX_MONOSPACE.otf", 64, (void*)0, 300);
 	bg = LoadTexture("assets/bg.png");
-	collectible_spsheet = LoadTexture("assets/coin.png");
+	collectible_spsheet = LoadTexture("assets/collectible_spsheet.png");
+	enemies_spsheet = LoadTexture("assets/zombie.png");
+	weapon_spsheet = LoadTexture("assets/weapon.png");
 
 	player = init_player((Vector2){ WIDTH/2, HEIGHT/2 }, (Vector2){ 64, 64 }, 300, 100, "assets/player.png");
-	weapon = init_weapon((Circle){ .center = (Vector2){ 200, 200 }, .radius = 16 }, 32, 16, 2.5f, 10, "assets/weapon.png", "assets/bullet.png");
-	coins = calloc(COIN_COUNT, sizeof(Collectible*));
-	for(int i = 0; i < COIN_COUNT; i++)
+	collectibles = calloc(COLLECTIBLE_COUNT, sizeof(Collectible*));
+	for(int i = 0; i < COLLECTIBLE_COUNT; i++)
 	{
-		coins[i] = init_collectible(COIN, (Vector2){ rand() % WIDTH, rand() % HEIGHT });
+		collectibles[i] = init_collectible(rand() % 2, (Vector2){ rand() % WIDTH, rand() % HEIGHT });
 	}
 	enemies = calloc(ENEMY_COUNT, sizeof(Enemy*));
 	for(int i = 0; i < ENEMY_COUNT; i++)
 	{
-		enemies[i] = init_enemy((Vector2){ .x = rand() % WIDTH, .y = rand() % HEIGHT }, (Vector2){ .x = 64, .y = 64 },
-											50, 40, rand() % 50 + 25 , "assets/zombie.png");
+		enemies[i] = init_enemy(ZOMBIE, (Vector2){ .x = rand() % WIDTH, .y = rand() % HEIGHT }, (Vector2){ .x = 64, .y = 64 },
+											50, 40, rand() % 50 + 25);
+	}
+	weapons = calloc(WEAPON_COUNT, sizeof(Weapon*));
+	for(int i = 0; i < WEAPON_COUNT; i++)
+	{
+		weapons[i] = init_weapon(PISTOL, (Vector2){ rand() % WIDTH, rand() % HEIGHT }, "assets/bullet.png");
 	}
 
 	camera = (Camera2D*)malloc(sizeof(Camera2D));
@@ -78,27 +87,7 @@ void update()
 	{
 		player_cam_pos.y = bg.height * SIZE_MULTIPLIER - HEIGHT/2;
 	}
-
 	camera->target = vec2_lerp(camera->target, player_cam_pos, 2.5f);
-
-
-	if(!weapon->is_picked_up && is_rec_circle_colliding(get_player_rec(player), weapon->cir))
-	{
-		DrawText("Press E to pick up", weapon->cir.center.x - weapon->cir.radius, weapon->cir.center.y - weapon->cir.radius - 32, 32, BLACK);
-		if(IsKeyPressed(KEY_E))
-		{
-			weapon->is_picked_up = true;
-			player->cur_wpn = weapon;
-		}
-	}
-
-	for(int i = 0; i < weapon->bullet_count; i++)
-	{
-		if(!weapon->bullets[i]->is_active) continue;
-
-		update_bullet(weapon->bullets[i]);
-	}
-
 
 	// CHECK IF PLAYER IS TAKING DAMAGE
 	bool player_is_taking_dmg = false;
@@ -109,30 +98,6 @@ void update()
 		update_enemy(enemies[i]);
 		
 		Vector2 enemy_mid = { .x = enemies[i]->pos.x + enemies[i]->size.x/2, .y = enemies[i]->pos.y + enemies[i]->size.y/2 };
-
-		for(int j = 0; j < weapon->bullet_count; j++)
-		{
-			if(!weapon->bullets[j]->is_active) continue;
-			
-			if(is_rec_circle_colliding(get_enemy_rec(enemies[i]), weapon->bullets[j]->cir))
-			{
-				enemies[i]->cur_hp -= weapon->damage;
-
-				if(enemies[i]->cur_hp <= 0)
-				{
-					// kill enemy
-					enemies[i]->cur_hp = 0;
-					enemies[i]->is_dead = true;
-					unsigned short dropped_coin_count = rand() % ENEMY_MAX_COIN_DROP + 1;
-					for(int i = 0; i < dropped_coin_count; i++)
-					{
-						add_collectible(init_collectible(COIN, enemy_mid), &coins, &COIN_COUNT);
-					}
-				}
-				weapon->bullets[j]->is_active = false;
-			}
-		}
-
 
 		if(vec2_distance(player_dest, enemy_mid) > 32)
 		{
@@ -159,14 +124,88 @@ void update()
 		}
 	}
 
-	for(int i = 0; i < COIN_COUNT; i++)
+	for(int w = 0; w < WEAPON_COUNT; w++)
 	{
-		// COLLECT COIN
-		if(is_rec_circle_colliding(get_player_rec(player), coins[i]->cir))
+		if(!player->cur_wpn && is_rec_circle_colliding(get_player_rec(player), weapons[w]->cir))
 		{
-			collected_coin++;
-			coins[i]->is_collected = true;
-			rerow_collectibles(&coins, &COIN_COUNT);
+			if(IsKeyPressed(KEY_E))
+			{
+				weapons[w]->is_picked_up = true;
+				player->cur_wpn = weapons[w];
+			}
+		}
+		for(int i = 0; i < weapons[w]->bullet_count; i++)
+		{
+			if(!weapons[w]->bullets[i]->is_active) continue;
+
+			update_bullet(weapons[w]->bullets[i]);
+		}
+		for(int i = 0; i < ENEMY_COUNT; i++)
+		{
+			if(enemies[i]->is_dead) continue;
+			Vector2 enemy_mid = { .x = enemies[i]->pos.x + enemies[i]->size.x/2, .y = enemies[i]->pos.y + enemies[i]->size.y/2 };
+
+			for(int j = 0; j < weapons[w]->bullet_count; j++)
+			{
+				if(!weapons[w]->bullets[j]->is_active) continue;
+				
+				if(is_rec_circle_colliding(get_enemy_rec(enemies[i]), weapons[w]->bullets[j]->cir))
+				{
+					enemies[i]->cur_hp -= weapons[w]->damage;
+
+					if(enemies[i]->cur_hp <= 0)
+					{
+						// kill enemy
+						kill_count++;
+						enemies[i]->cur_hp = 0;
+						enemies[i]->is_dead = true;
+						unsigned short dropped_coin_count = rand() % ENEMY_MAX_COIN_DROP + 1;
+						for(int i = 0; i < dropped_coin_count; i++)
+						{
+							add_collectible(init_collectible(COIN, enemy_mid), &collectibles, &COLLECTIBLE_COUNT);
+						}
+
+						float medkit_chance = (float)(rand() % 100)/100.0f;
+						printf("%f\n", medkit_chance);
+						if(medkit_chance <= ENEMY_MEDKIT_DROP_CHANCE)
+						{
+							add_collectible(init_collectible(MEDKIT, enemy_mid), &collectibles, &COLLECTIBLE_COUNT);
+						}
+					}
+					weapons[w]->bullets[j]->is_active = false;
+				}
+			}
+		}
+	}
+
+	for(int i = 0; i < COLLECTIBLE_COUNT; i++)
+	{
+		// COLLECT ITEMS
+		if(is_rec_circle_colliding(get_player_rec(player), collectibles[i]->cir))
+		{
+			bool collected_item = false;
+			switch(collectibles[i]->type)
+			{
+				case COIN:
+					collected_coin++;
+					collected_item = true;
+					break;
+				case MEDKIT:
+					if(player->cur_hp == player->max_hp) break;
+					player->cur_hp = player->max_hp;
+					collected_item = true;
+					break;
+				default:
+					printf("Unidentified type for collectible: %d\n", collectibles[i]->type);
+					exit(1);
+				
+			}
+			if(collected_item)
+			{
+				collectibles[i]->is_collected = true;
+				rerow_collectibles(&collectibles, &COLLECTIBLE_COUNT);
+			}
+			
 		}
 	}
 
@@ -179,9 +218,9 @@ void late_update()
 	BeginMode2D(*camera);
 	DrawTextureEx(bg, (Vector2){ 0 }, 0, SIZE_MULTIPLIER, WHITE);
 
-	for(int i = 0; i < COIN_COUNT; i++)
+	for(int i = 0; i < COLLECTIBLE_COUNT; i++)
 	{
-		draw_collectible(coins[i], collectible_spsheet);
+		draw_collectible(collectibles[i], collectible_spsheet);
 	}
 	for(int i = 0; i < 3; i++)
 	{
@@ -193,10 +232,13 @@ void late_update()
 		for(int j = 0; j < ENEMY_COUNT; j++)
 		{
 			if(enemies[j]->is_dead || enemies[j]->sprite_order != i) continue;
-			draw_enemy(enemies[j]);
+			draw_enemy(enemies[j], enemies_spsheet);
 		}
 	}
-	draw_weapon(weapon);
+	for(int i = 0; i < WEAPON_COUNT; i++)
+	{
+		draw_weapon(weapons[i], weapon_spsheet);
+	}
 	EndMode2D();
 }
 
@@ -231,15 +273,6 @@ void draw_ui()
 
 void finish()
 {
-	free(player);
-	for(int i = 0; i < weapon->bullet_count; i++)
-	{
-		free(weapon->bullets[i]);
-	}
-	free(weapon->bullets);
-	free(weapon);
-	for(int i = 0; i < ENEMY_COUNT; i++)
-	{
-		free(enemies[i]);
-	}
+	printf("Total colleted coins: %d\n", collected_coin);
+	printf("Total killed enemies: %d\n", kill_count);
 }

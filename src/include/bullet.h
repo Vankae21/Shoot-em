@@ -8,6 +8,12 @@
 
 typedef struct
 {
+	enum
+	{
+		PISTOL_BULLET,
+		PYROGUN_BULLET
+	} type;
+
 	Circle cir;
 	float speed;
 	Vector2 dir;

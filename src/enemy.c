@@ -4,10 +4,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-Enemy* init_enemy(Vector2 pos, Vector2 size, float max_hp, float damage, float speed, const char* tex_path)
+Enemy* init_enemy(unsigned short type, Vector2 pos, Vector2 size, float max_hp, float damage, float speed)
 {
 	Enemy* enemy = calloc(1, sizeof(Enemy));
 
+	enemy->type = type;
 	enemy->pos = pos;
 	enemy->size = size;
 	enemy->dir = (Vector2){ 0 };
@@ -18,7 +19,6 @@ Enemy* init_enemy(Vector2 pos, Vector2 size, float max_hp, float damage, float s
 	enemy->is_dead = false;
 	enemy->sprite_order = 0;
 	enemy->is_facing_right = false;
-	enemy->tex = LoadTexture(tex_path);
 
 	return enemy;
 }
@@ -38,11 +38,11 @@ void update_enemy(Enemy* enemy)
 	enemy->pos.y += enemy->dir.y * enemy->speed * GetFrameTime();
 }
 
-void draw_enemy(Enemy* enemy)
+void draw_enemy(Enemy* enemy, Texture2D enemies_spsheet)
 {
 	short tx_multiplier = enemy->is_facing_right ? -1 : 1;
 
-	DrawTexturePro(enemy->tex, (Rectangle){ .x = 0, .y = 0, .width = enemy->tex.width * tx_multiplier, .height = enemy->tex.height },
+	DrawTexturePro(enemies_spsheet, (Rectangle){ .x = 32 * enemy->type, .y = 0, .width = 32 * tx_multiplier, .height = 32 },
 					get_enemy_rec(enemy), (Vector2){ 0 }, 0, WHITE);
 
 	if(enemy->cur_hp == enemy->max_hp) return;
