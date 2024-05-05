@@ -8,12 +8,13 @@
 #include "include/weapon.h"
 #include "include/enemy.h"
 #include "include/collectible.h"
+#include "include/gamecamera.h"
 
 unsigned int collected_coin = 0;
 unsigned int kill_count = 0;
 unsigned int ENEMY_COUNT = 2;
 unsigned int COLLECTIBLE_COUNT = 0;
-unsigned int WEAPON_COUNT = 400;
+unsigned int WEAPON_COUNT = 2;
 
 Font font;
 Texture2D bg;
@@ -22,11 +23,9 @@ Texture2D enemies_spsheet;
 Texture2D weapon_spsheet;
 Player* player = (void*)0;
 Weapon** weapons = (void*)0;
-Camera2D* camera = (void*)0;
+GameCamera* gamecamera = (void*)0;
 Collectible** collectibles = (void*)0;
 Enemy** enemies = (void*)0;
-
-
 
 void init()
 {
@@ -36,10 +35,11 @@ void init()
 	bg = LoadTexture("assets/bg.png");
 	collectible_spsheet = LoadTexture("assets/collectible_spsheet.png");
 	enemies_spsheet = LoadTexture("assets/zombie.png");
-	weapon_spsheet = LoadTexture("assets/weapon.png");
+	weapon_spsheet = LoadTexture("assets/weapon_spsheet.png");
 
 	player = init_player((Vector2){ WIDTH/2, HEIGHT/2 }, (Vector2){ 64, 64 }, 300, 100, "assets/player.png");
 	collectibles = calloc(COLLECTIBLE_COUNT, sizeof(Collectible*));
+
 	for(int i = 0; i < COLLECTIBLE_COUNT; i++)
 	{
 		collectibles[i] = init_collectible(rand() % 2, (Vector2){ rand() % WIDTH, rand() % HEIGHT });
@@ -48,7 +48,7 @@ void init()
 	for(int i = 0; i < ENEMY_COUNT; i++)
 	{
 		enemies[i] = init_enemy(ZOMBIE, (Vector2){ .x = rand() % WIDTH, .y = rand() % HEIGHT }, (Vector2){ .x = 64, .y = 64 },
-											50, 40, rand() % 50 + 25);
+											50, 40, rand() % 150 + 50);
 	}
 	weapons = calloc(WEAPON_COUNT, sizeof(Weapon*));
 	for(int i = 0; i < WEAPON_COUNT; i++)
@@ -56,18 +56,14 @@ void init()
 		weapons[i] = init_weapon(PISTOL, (Vector2){ rand() % WIDTH, rand() % HEIGHT }, "assets/bullet.png");
 	}
 
-	camera = (Camera2D*)malloc(sizeof(Camera2D));
-	camera->target = (Vector2){ .x = player->pos.x + player->size.x/2, .y = player->pos.y + player->size.y/2 };
-	camera->offset = (Vector2){ .x = WIDTH/2, .y = HEIGHT/2 };
-	camera->zoom = 1.0f;
-	camera->rotation = 0;
+	gamecamera = init_camera((Vector2){ WIDTH/2, HEIGHT/2 }, (Vector2){player->pos.x + player->size.x/2, player->pos.y + player->size.y/2});
 }
 
 void update()
 {	
-	camera->zoom += GetMouseWheelMove() * GetFrameTime();
+	gamecamera->camera->zoom += GetMouseWheelMove() * GetFrameTime();
 	update_player(player);
-	Vector2 player_dest = { .x = player->pos.x + player->size.x/2, .y = player->pos.y + player->size.y/2 };
+	Vector2 player_dest = vec2_sum(player->pos, vec2_div(player->size, 2));
 
 	Vector2 player_cam_pos = player_dest;
 
@@ -87,7 +83,7 @@ void update()
 	{
 		player_cam_pos.y = bg.height * SIZE_MULTIPLIER - HEIGHT/2;
 	}
-	camera->target = vec2_lerp(camera->target, player_cam_pos, 2.5f);
+	update_camera(gamecamera, player_cam_pos);
 
 	// CHECK IF PLAYER IS TAKING DAMAGE
 	bool player_is_taking_dmg = false;
@@ -151,7 +147,11 @@ void update()
 				
 				if(is_rec_circle_colliding(get_enemy_rec(enemies[i]), weapons[w]->bullets[j]->cir))
 				{
+					float knockback = 20;
 					enemies[i]->cur_hp -= weapons[w]->damage;
+					enemies[i]->knockback_complete = false;
+					enemies[i]->knockback_pos = (Vector2){ enemies[i]->pos.x + knockback * weapons[w]->bullets[j]->dir.x,
+															enemies[i]->pos.y + knockback * weapons[w]->bullets[j]->dir.y };
 
 					if(enemies[i]->cur_hp <= 0)
 					{
@@ -215,7 +215,7 @@ void update()
 
 void late_update()
 {
-	BeginMode2D(*camera);
+	BeginMode2D(*(gamecamera->camera));
 	DrawTextureEx(bg, (Vector2){ 0 }, 0, SIZE_MULTIPLIER, WHITE);
 
 	for(int i = 0; i < COLLECTIBLE_COUNT; i++)
@@ -269,6 +269,7 @@ void draw_ui()
 		sprintf(wpn_text, "Ammo:%d/%d", wpn->cur_ammo, wpn->max_ammo);
 		DrawTextEx(font, wpn_text, (Vector2){ 256, 0 }, 64, 0, BLACK);
 	}
+
 }
 
 void finish()

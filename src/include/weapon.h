@@ -10,7 +10,7 @@ typedef struct
 	enum
 	{
 		PISTOL,
-		PYROGUN
+		LASERGUN
 	} type;
 
 	Circle cir;
@@ -25,6 +25,10 @@ typedef struct
 	float cur_reload_time;
 	float damage;
 	Texture2D bullet_tex;
+	float shot_break;
+	float shot_break_time_elapsed;
+	bool can_shoot;
+	float offset;
 } Weapon;
 
 Weapon* init_weapon(unsigned short type, Vector2 pos, const char* bullet_tex_path);

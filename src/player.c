@@ -56,7 +56,7 @@ void update_player(Player* player)
 
 	if(player->cur_wpn)
 	{
-		Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), *camera);
+		Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), *(gamecamera->camera));
 		Vector2 pointer = { .x = mousePos.x - player->pos.x - player->size.x/2, .y = mousePos.y - player->pos.y - player->size.y/2 };
 		Vector2 pointer_dir = vec2_normalize(pointer);
 
@@ -68,11 +68,25 @@ void update_player(Player* player)
 		{
 			player->is_facing_right = false;
 		}
-
-		player->cur_wpn->cir.center = (Vector2){ .x = player->pos.x + player->size.x/2 + pointer_dir.x * 64,
-												.y = player->pos.y + player->size.y/2 + pointer_dir.y * 64};
-
 		player->cur_wpn->dir = pointer_dir;
+		if(!player->cur_wpn->can_shoot)
+		{
+			float shot_perc = player->cur_wpn->shot_break_time_elapsed / player->cur_wpn->shot_break;
+			if(shot_perc < 0.5f)
+			{
+				player->cur_wpn->offset = shot_perc;
+			}
+			else
+			{
+				player->cur_wpn->offset = 1.0f - shot_perc;
+			}
+		}
+		float weapon_offset = player->cur_wpn->offset;
+		player->cur_wpn->cir.center = (Vector2){ .x = player->pos.x + player->size.x/2 + pointer_dir.x * 64 -
+													  pointer_dir.x * 32 * weapon_offset,
+												 .y = player->pos.y + player->size.y/2 + pointer_dir.y * 64 -
+												 	  pointer_dir.y * 32 * weapon_offset};
+
 
 		update_weapon(player->cur_wpn);
 

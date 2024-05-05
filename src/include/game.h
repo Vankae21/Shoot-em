@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include <raylib.h>
+#include "gamecamera.h"
 
 #define WIDTH 1280
 #define HEIGHT 720
@@ -9,8 +10,8 @@
 #define FPS 60
 #define DEBUG 0
 #define SIZE_MULTIPLIER 2
-extern unsigned int ENEMY_COUNT;
-extern Camera2D* camera;
+extern unsigned int ENEMY_COUNT, WEAPON_COUNT;
+extern GameCamera* gamecamera;
 
 void init();
 void update();

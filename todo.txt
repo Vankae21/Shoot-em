@@ -8,5 +8,5 @@ make coins dropped from enemies X
 make coins animated when they are on ground X
 realloc coins array when new coins dropped X
 make medkit X
-use sprite layer when enemies colliding with player
 make multiple weapons on the map at the same time X
+make joystick X

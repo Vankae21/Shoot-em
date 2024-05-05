@@ -24,6 +24,8 @@ typedef struct
 	bool is_dead;
 	int sprite_order;
 	bool is_facing_right;
+	bool knockback_complete;
+	Vector2 knockback_pos;
 } Enemy;
 
 Enemy* init_enemy(unsigned short type, Vector2 pos, Vector2 size, float max_hp, float damage, float speed);

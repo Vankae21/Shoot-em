@@ -19,12 +19,26 @@ Enemy* init_enemy(unsigned short type, Vector2 pos, Vector2 size, float max_hp, 
 	enemy->is_dead = false;
 	enemy->sprite_order = 0;
 	enemy->is_facing_right = false;
+	enemy->knockback_complete = true;
+	enemy->knockback_pos = enemy->pos;
 
 	return enemy;
 }
 
 void update_enemy(Enemy* enemy)
 {
+	if(!enemy->knockback_complete)
+	{
+		enemy->pos = vec2_translate(enemy->pos, enemy->knockback_pos, 400);
+		if(vec2_cmp(enemy->pos, enemy->knockback_pos))
+		{
+			enemy->knockback_complete = true;
+		}
+		else
+		{
+			return;
+		}
+	}
 	if(enemy->dir.x > 0)
 	{
 		enemy->is_facing_right = true;
@@ -33,7 +47,6 @@ void update_enemy(Enemy* enemy)
 	{
 		enemy->is_facing_right = false;
 	}
-
 	enemy->pos.x += enemy->dir.x * enemy->speed * GetFrameTime();
 	enemy->pos.y += enemy->dir.y * enemy->speed * GetFrameTime();
 }

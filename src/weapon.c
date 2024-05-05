@@ -16,7 +16,9 @@ Weapon* init_weapon(unsigned short type, Vector2 pos, const char* bullet_tex_pat
 	weapon->dir = (Vector2){ 0, 0 };
 	weapon->is_reloading = false;
 	weapon->cur_reload_time = 0;
-
+	weapon->shot_break_time_elapsed = 0;
+	weapon->can_shoot = true;
+	weapon->offset = 0;
 	switch(type)
 	{
 		case PISTOL:
@@ -25,6 +27,11 @@ Weapon* init_weapon(unsigned short type, Vector2 pos, const char* bullet_tex_pat
 			weapon->max_ammo = 16;
 			weapon->reload_time = 2.5f;
 			weapon->damage = 10;
+			weapon->shot_break = 0.33f;
+			break;
+		
+		default:
+			break;
 	}
 
 	weapon->cur_ammo = weapon->max_ammo;
@@ -35,42 +42,63 @@ Weapon* init_weapon(unsigned short type, Vector2 pos, const char* bullet_tex_pat
 
 void update_weapon(Weapon* weapon)
 {
-	// reload ammo
-	if(weapon->is_reloading)
+	switch(weapon->type)
 	{
-		if(weapon->cur_reload_time < weapon->reload_time)
-		{
-			weapon->cur_reload_time += GetFrameTime();
-			if(weapon->cur_reload_time > weapon->reload_time)
+		case PISTOL:
+			// reload ammo
+			if(weapon->is_reloading)
 			{
-				weapon->is_reloading = false;
-				weapon->cur_ammo = weapon->max_ammo;
-				weapon->cur_reload_time = 0;
+				weapon->can_shoot = false;
+				weapon->shot_break_time_elapsed = 0;
+				if(weapon->cur_reload_time < weapon->reload_time)
+				{
+					weapon->cur_reload_time += GetFrameTime();
+					if(weapon->cur_reload_time > weapon->reload_time)
+					{
+						weapon->is_reloading = false;
+						weapon->can_shoot = true;
+						weapon->cur_ammo = weapon->max_ammo;
+						weapon->cur_reload_time = 0;
+					}
+				}
 			}
-		}
-	}
+			else if(!weapon->can_shoot)
+			{
+				weapon->shot_break_time_elapsed += GetFrameTime();
+				if(weapon->shot_break_time_elapsed >= weapon->shot_break)
+				{
+					weapon->can_shoot = true;
+					weapon->shot_break_time_elapsed = 0;
+					weapon->offset = 0;
+				}
+			}
 
-	// trigger reload
-	if((IsKeyPressed(KEY_R) && weapon->cur_ammo != weapon->max_ammo)
-	//	|| (IsMouseButtonPressed(0) && weapon->cur_ammo == 0)
-		)
-	{
-		weapon->is_reloading = true;
-	}
+			// trigger reload
+			if((IsKeyPressed(KEY_R) && weapon->cur_ammo != weapon->max_ammo))
+			{
+				weapon->is_reloading = true;
+			}
 
-	// shoot ammo
-	if(!weapon->is_reloading && weapon->cur_ammo > 0 && IsMouseButtonPressed(0))
-	{
-		for(int i = 0; i < weapon->bullet_count; i++)
-		{
-			if(weapon->bullets[i]->is_active) continue;
-				
-			weapon->bullets[i]->is_active = true;
-			weapon->bullets[i]->cir.center = weapon->cir.center;
-			weapon->bullets[i]->dir = weapon->dir;
-			weapon->cur_ammo--;
+			// shoot ammo
+			if(weapon->can_shoot && weapon->cur_ammo > 0 && IsMouseButtonPressed(0))
+			{
+				weapon->can_shoot = false;
+				for(int i = 0; i < weapon->bullet_count; i++)
+				{
+					if(weapon->bullets[i]->is_active) continue;
+						
+					weapon->bullets[i]->is_active = true;
+					weapon->bullets[i]->cir.center = weapon->cir.center;
+					weapon->bullets[i]->dir = weapon->dir;
+					weapon->cur_ammo--;
+					break;
+				}	
+			}
 			break;
-		}	
+
+			default:
+				printf("Error weapon type: %d\n", weapon->type);
+				break;
 	}
 }
 

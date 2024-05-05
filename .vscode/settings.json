@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "vutils.h": "c",
+        "gamecamera.h": "c"
+    }
+}

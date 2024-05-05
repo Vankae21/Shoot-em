@@ -1,5 +1,15 @@
 #include "include/vutils.h"
 
+int str_to_int(const char* str)
+{
+	int r = 0;
+	for(int i = 0; str[i] != '\0'; i++)
+	{
+		r = r * 10 + str[i] - 48;
+	}
+	return r;
+}
+
 float vec2_len(Vector2 vec)
 {
 	return sqrtf(vec.x * vec.x + vec.y * vec.y);
@@ -40,4 +50,26 @@ Vector2 vec2_lerp(Vector2 start_vec, Vector2 end_vec, float t)
 {
 	Vector2 diff = { .x = end_vec.x - start_vec.x, .y = end_vec.y - start_vec.y };
 	return (Vector2){ .x = start_vec.x + diff.x * t * GetFrameTime(), .y = start_vec.y + diff.y * t * GetFrameTime() };
+}
+
+Vector2 vec2_translate(Vector2 start_vec, Vector2 end_vec, float t)
+{
+	Vector2 dir = vec2_normalize((Vector2){ .x = end_vec.x - start_vec.x, .y = end_vec.y - start_vec.y });
+	return vec2_distance(start_vec, end_vec) > t * GetFrameTime() ?
+			(Vector2){ .x = start_vec.x + dir.x * t * GetFrameTime(), .y = start_vec.y + dir.y * t * GetFrameTime() } : end_vec;
+}
+
+bool vec2_cmp(Vector2 a, Vector2 b)
+{
+	return (a.x == b.x && a.y == b.y);
+}
+
+Vector2 vec2_sum(Vector2 a, Vector2 b)
+{
+	return (Vector2){ a.x + b.x, a.y + b.y };
+}
+
+Vector2 vec2_div(Vector2 a, float divisor)
+{
+	return (Vector2){ a.x/divisor, a.y/divisor };
 }
