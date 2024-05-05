@@ -141,13 +141,18 @@ void update_player(Player* player)
 	}
 }
 void draw_player(Player* player)
-{	
-
+{
 	Rectangle pl_rec = get_player_rec(player);
 
 	pl_rec.height -= player->height_dif; pl_rec.y += player->height_dif;
 
 	short tx_multiplier = player->is_facing_right ? -1 : 1;
+	
+	//SHADOW//
+	if(IS_SHADOWED)
+	DrawRectangle(pl_rec.x + SHADOW_OFFSET, pl_rec.y + SHADOW_OFFSET, pl_rec.width, pl_rec.height, SHADOW_COLOR);
+	//SHADOW//
+
 	DrawTexturePro(player->tex, (Rectangle){ .x = 0, .y = 0, .width = player->tex.width * tx_multiplier, .height = player->tex.height },
 					pl_rec, (Vector2){ 0 }, 0, WHITE);
 }

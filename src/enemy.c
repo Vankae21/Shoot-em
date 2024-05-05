@@ -55,8 +55,10 @@ void draw_enemy(Enemy* enemy, Texture2D enemies_spsheet)
 {
 	short tx_multiplier = enemy->is_facing_right ? -1 : 1;
 
+	Color color = enemy->knockback_complete ? WHITE : RED;
+
 	DrawTexturePro(enemies_spsheet, (Rectangle){ .x = 32 * enemy->type, .y = 0, .width = 32 * tx_multiplier, .height = 32 },
-					get_enemy_rec(enemy), (Vector2){ 0 }, 0, WHITE);
+					get_enemy_rec(enemy), (Vector2){ 0 }, 0, color);
 
 	if(enemy->cur_hp == enemy->max_hp) return;
 
@@ -64,7 +66,14 @@ void draw_enemy(Enemy* enemy, Texture2D enemies_spsheet)
 	int bar_y = enemy->pos.y - 16;
 	int bar_width = enemy->size.x; int bar_height = 8;
 	DrawRectangle(bar_x, bar_y, bar_width, bar_height, RED);
-	DrawRectangle(bar_x, bar_y, bar_width * enemy->cur_hp / enemy->max_hp, bar_height, GREEN);
+	DrawRectangle(bar_x, bar_y, bar_width * enemy->cur_hp / enemy->max_hp, bar_height, DARKGREEN);
+}
+
+void draw_enemy_shadow(Enemy* enemy)
+{
+	Rectangle e_rec = get_enemy_rec(enemy);
+
+	DrawRectangle(e_rec.x + SHADOW_OFFSET, e_rec.y + SHADOW_OFFSET, e_rec.width, e_rec.height, SHADOW_COLOR);
 }
 
 Rectangle get_enemy_rec(Enemy* enemy)

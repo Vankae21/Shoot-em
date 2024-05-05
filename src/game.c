@@ -10,6 +10,9 @@
 #include "include/collectible.h"
 #include "include/gamecamera.h"
 
+bool IS_SHADOWED = false;
+bool is_paused = false;
+
 unsigned int collected_coin = 0;
 unsigned int kill_count = 0;
 unsigned int ENEMY_COUNT = 2;
@@ -56,34 +59,22 @@ void init()
 		weapons[i] = init_weapon(PISTOL, (Vector2){ rand() % WIDTH, rand() % HEIGHT }, "assets/bullet.png");
 	}
 
-	gamecamera = init_camera((Vector2){ WIDTH/2, HEIGHT/2 }, (Vector2){player->pos.x + player->size.x/2, player->pos.y + player->size.y/2});
+	gamecamera = init_camera((Vector2){ WIDTH/2, HEIGHT/2 }, player);
 }
 
 void update()
 {	
+	if(IsKeyPressed(KEY_P))
+	{
+		is_paused = is_paused ? 0 : 1;
+	}
+	if(is_paused) return;
+
 	gamecamera->camera->zoom += GetMouseWheelMove() * GetFrameTime();
 	update_player(player);
 	Vector2 player_dest = vec2_sum(player->pos, vec2_div(player->size, 2));
 
-	Vector2 player_cam_pos = player_dest;
-
-	if(player->pos.x + player->size.x/2 - WIDTH/2 < 0)
-	{
-		player_cam_pos.x = WIDTH/2;
-	}
-	else if(player->pos.x + player->size.x/2 + WIDTH/2 > bg.width * SIZE_MULTIPLIER)
-	{
-		player_cam_pos.x = bg.width * SIZE_MULTIPLIER - WIDTH/2;
-	}
-	if(player->pos.y + player->size.y/2 - HEIGHT/2 < 0)
-	{
-		player_cam_pos.y = HEIGHT/2;
-	}
-	else if(player->pos.y + player->size.y/2 + HEIGHT/2 > bg.height * SIZE_MULTIPLIER)
-	{
-		player_cam_pos.y = bg.height * SIZE_MULTIPLIER - HEIGHT/2;
-	}
-	update_camera(gamecamera, player_cam_pos);
+	update_camera(gamecamera, (Vector2){ bg.width * SIZE_MULTIPLIER, bg.height * SIZE_MULTIPLIER });
 
 	// CHECK IF PLAYER IS TAKING DAMAGE
 	bool player_is_taking_dmg = false;
@@ -217,10 +208,21 @@ void late_update()
 {
 	BeginMode2D(*(gamecamera->camera));
 	DrawTextureEx(bg, (Vector2){ 0 }, 0, SIZE_MULTIPLIER, WHITE);
-
+	
+	for(int i = 0; i < COLLECTIBLE_COUNT; i++)
+	{
+		if(!IS_SHADOWED) break;
+		draw_collectible_shadow(collectibles[i]);
+	}
 	for(int i = 0; i < COLLECTIBLE_COUNT; i++)
 	{
 		draw_collectible(collectibles[i], collectible_spsheet);
+	}
+	for(int i = 0; i < ENEMY_COUNT; i++)
+	{
+		if(!IS_SHADOWED) break;
+		if(enemies[i]->is_dead) continue;
+		draw_enemy_shadow(enemies[i]);
 	}
 	for(int i = 0; i < 3; i++)
 	{
@@ -252,7 +254,7 @@ void draw_ui()
 	//player UI
 	Rectangle pl_hp_bar = { .x = 16, .y = 16, .width = 192, .height = 32 };
 	DrawRectangleRec(pl_hp_bar, RED);
-	DrawRectangle(pl_hp_bar.x, pl_hp_bar.y, pl_hp_bar.width * player->cur_hp / player->max_hp, pl_hp_bar.height, GREEN);
+	DrawRectangle(pl_hp_bar.x, pl_hp_bar.y, pl_hp_bar.width * player->cur_hp / player->max_hp, pl_hp_bar.height, DARKGREEN);
 	DrawRectangleLinesEx(pl_hp_bar, 6, BLACK);
 
 	// COIN UI

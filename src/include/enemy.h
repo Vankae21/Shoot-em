@@ -31,6 +31,7 @@ typedef struct
 Enemy* init_enemy(unsigned short type, Vector2 pos, Vector2 size, float max_hp, float damage, float speed);
 void update_enemy(Enemy* enemy);
 void draw_enemy(Enemy* enemy, Texture2D enemies_spsheet);
+void draw_enemy_shadow(Enemy* enemy);
 Rectangle get_enemy_rec(Enemy* enemy);
 
 #endif

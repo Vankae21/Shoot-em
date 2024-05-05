@@ -13,5 +13,3 @@ done
 gcc $OBJ_DIR/*.o -o main -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
 rm -r $OBJ_DIR
-
-./main

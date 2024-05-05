@@ -23,6 +23,7 @@ typedef struct
 
 Collectible* init_collectible(unsigned int type, Vector2 pos);
 void draw_collectible(Collectible* collectible, Texture2D collectible_spsheet);
+void draw_collectible_shadow(Collectible* collectible);
 void rerow_collectibles(Collectible*** list, unsigned int* count);
 void add_collectible(Collectible* c, Collectible*** list, unsigned int* count);
 

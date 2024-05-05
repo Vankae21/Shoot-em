@@ -10,6 +10,9 @@
 #define FPS 60
 #define DEBUG 0
 #define SIZE_MULTIPLIER 2
+#define SHADOW_OFFSET 8
+#define SHADOW_COLOR (Color){ 0, 0, 0, 100 }
+extern bool IS_SHADOWED;
 extern unsigned int ENEMY_COUNT, WEAPON_COUNT;
 extern GameCamera* gamecamera;
 

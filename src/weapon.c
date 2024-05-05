@@ -83,6 +83,7 @@ void update_weapon(Weapon* weapon)
 			if(weapon->can_shoot && weapon->cur_ammo > 0 && IsMouseButtonPressed(0))
 			{
 				weapon->can_shoot = false;
+				gamecamera->is_shaking = true;
 				for(int i = 0; i < weapon->bullet_count; i++)
 				{
 					if(weapon->bullets[i]->is_active) continue;

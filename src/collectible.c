@@ -1,4 +1,5 @@
 #include "include/collectible.h"
+#include "include/game.h"
 #include <stdlib.h>
 
 Collectible* init_collectible(unsigned int type, Vector2 pos)
@@ -50,7 +51,6 @@ void draw_collectible(Collectible* collectible, Texture2D collectible_spsheet)
         collectible->drop_time += GetFrameTime();
     }
     
-
     DrawTexturePro(collectible_spsheet, (Rectangle){ .x = 16 * collectible->type, .y = 0, .width = 16, .height = 16 },
                     (Rectangle){.x = collectible->cir.center.x - collectible->cir.radius,
                                 .y = collectible->cir.center.y - collectible->cir.radius - collectible->offset,
@@ -58,6 +58,22 @@ void draw_collectible(Collectible* collectible, Texture2D collectible_spsheet)
                                 .height = collectible->cir.radius * 2,},
                     (Vector2){ 0 }, 0.0f, WHITE
     );
+}
+
+void draw_collectible_shadow(Collectible* collectible)
+{
+    switch(collectible->type)
+    {
+        case COIN:
+            DrawCircle(collectible->cir.center.x + SHADOW_OFFSET, collectible->cir.center.y + SHADOW_OFFSET - collectible->offset,
+                        collectible->cir.radius, SHADOW_COLOR);
+            break;
+        
+        case MEDKIT:
+            DrawRectangle(/*x*/ collectible->cir.center.x - collectible->cir.radius + SHADOW_OFFSET,
+                          /*y*/ collectible->cir.center.y - collectible->cir.radius + SHADOW_OFFSET - collectible->offset,
+                                collectible->cir.radius * 2, collectible->cir.radius * 2, SHADOW_COLOR);
+    }
 }
 
 void rerow_collectibles(Collectible*** list, unsigned int* count)

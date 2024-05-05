@@ -3,13 +3,18 @@
 
 #include <raylib.h>
 #include "vutils.h"
+#include "player.h"
 
 typedef struct
 {
     Camera2D* camera;
+    Player* player;
+    float shake_sin;
+    float shake_time;
+    bool is_shaking;
 } GameCamera;
 
-GameCamera* init_camera(Vector2 offset, Vector2 target);
-void update_camera(GameCamera* camera, Vector2 target);
+GameCamera* init_camera(Vector2 offset, Player* player);
+void update_camera(GameCamera* gamecamera, Vector2 max_frame);
 
 #endif
