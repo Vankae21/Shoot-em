@@ -14,7 +14,7 @@ Collectible* init_collectible(unsigned int type, Vector2 pos)
     collectible->drop_time = 0;
     collectible->is_floating = 0;
     collectible->velocity = 0;
-    collectible->dir_x = (float)(rand() % 50) + 30; collectible->dir_x *= rand() % 100 > 50 ? 1 : -1;
+    collectible->dir_x = (float)(rand() % 30) + 50; collectible->dir_x *= rand() % 100 > 50 ? 1 : -1;
 
     return collectible;
 }
