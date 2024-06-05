@@ -31,7 +31,7 @@ typedef struct
 } Player;
 
 Player* init_player(Vector2 pos, Vector2 size, float speed, float max_hp, const char* tex_path);
-void update_player(Player* player);
+void update_player(Player* player, Vector2 max_frame);
 void draw_player(Player* player);
 Rectangle get_player_rec(Player* player);
 

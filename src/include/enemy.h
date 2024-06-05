@@ -32,6 +32,9 @@ Enemy* init_enemy(unsigned short type, Vector2 pos, Vector2 size, float max_hp, 
 void update_enemy(Enemy* enemy);
 void draw_enemy(Enemy* enemy, Texture2D enemies_spsheet);
 void draw_enemy_shadow(Enemy* enemy);
+void rerow_enemies(Enemy*** list, unsigned int* count);
+void add_enemy(Enemy* e, Enemy*** list, unsigned int* count);
 Rectangle get_enemy_rec(Enemy* enemy);
+Vector2 get_enemy_mid(Enemy* enemy);
 
 #endif

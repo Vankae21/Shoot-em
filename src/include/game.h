@@ -4,17 +4,18 @@
 #include <raylib.h>
 #include "gamecamera.h"
 
-#define WIDTH 1280
-#define HEIGHT 720
-#define TITLE "GEYM"
+#define TITLE "Shoot Those Mfs"
 #define FPS 60
 #define DEBUG 0
-#define SIZE_MULTIPLIER 2
+#define DEF_WIDTH 1280
+#define DEF_HEIGHT 720
+#define SIZE_MULTIPLIER 
 #define SHADOW_OFFSET 8
-#define SHADOW_COLOR (Color){ 0, 0, 0, 100 }
-extern bool IS_SHADOWED;
+#define SHADOW_COLOR (Color){ 0, 0, 0, 50 }
+extern bool IS_FULLSCREEN, IS_SHADOWED;
 extern unsigned int ENEMY_COUNT, WEAPON_COUNT;
 extern GameCamera* gamecamera;
+extern int WIDTH, HEIGHT;
 
 void init();
 void update();

@@ -14,7 +14,7 @@ typedef struct
     bool is_shaking;
 } GameCamera;
 
-GameCamera* init_camera(Vector2 offset, Player* player);
+GameCamera* init_camera(Player* player);
 void update_camera(GameCamera* gamecamera, Vector2 max_frame);
 
 #endif

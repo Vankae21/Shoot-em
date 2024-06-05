@@ -1,9 +1,9 @@
 {
     "files.associations": {
+        "float.h": "c",
+        "weapon.h": "c",
         "vutils.h": "c",
-        "gamecamera.h": "c",
-        "raylib.h": "c",
-        "any": "c",
-        "stdbool.h": "c"
+        "game.h": "c",
+        "player.h": "c"
     }
 }

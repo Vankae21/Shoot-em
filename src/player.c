@@ -36,7 +36,7 @@ Player* init_player(Vector2 pos, Vector2 size, float speed, float max_hp, const 
 	return player;
 }
 
-void update_player(Player* player)
+void update_player(Player* player, Vector2 max_frame)
 {
 	Vector2 input = { .x = IsKeyDown(KEY_D) - IsKeyDown(KEY_A), .y = IsKeyDown(KEY_S) - IsKeyDown(KEY_W) };
 
@@ -49,11 +49,7 @@ void update_player(Player* player)
 		player->is_facing_right = false;
 	}
 
-	player->move_dir = vec2_normalize(input);
-
-	player->pos.x += player->move_dir.x * player->speed * GetFrameTime();
-	player->pos.y += player->move_dir.y * player->speed * GetFrameTime();
-
+	float move_speed_divisor = 1;
 	if(player->cur_wpn)
 	{
 		Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), *(gamecamera->camera));
@@ -90,7 +86,11 @@ void update_player(Player* player)
 
 		update_weapon(player->cur_wpn);
 
-		
+		if(player->cur_wpn->type == MINIGUN && !player->cur_wpn->can_shoot)
+		{
+			move_speed_divisor = 0.2f;
+		}
+
 		if(IsKeyPressed(KEY_Q))
 		{
 			player->cur_wpn->is_picked_up = false;
@@ -99,8 +99,18 @@ void update_player(Player* player)
 			player->cur_wpn->dir = (Vector2){ 0 };
 			player->cur_wpn = (void*)0;
 		}
+	
 	}
 
+	// MOVE PLAYER
+	player->move_dir = vec2_normalize(input);
+	player->pos.x += player->move_dir.x * move_speed_divisor * player->speed * GetFrameTime();
+	player->pos.y += player->move_dir.y * move_speed_divisor * player->speed * GetFrameTime();
+
+	if (player->pos.x < 0) player->pos.x = 0;
+	else if (player->pos.x + player->size.x > max_frame.x) player->pos.x = max_frame.x - player->size.x;
+	if (player->pos.y < 0) player->pos.y = 0;
+	else if (player->pos.y + player->size.y > max_frame.y) player->pos.y = max_frame.y - player->size.y;
 
 	// TEST PURPOSE
 	if(DEBUG)
@@ -110,7 +120,7 @@ void update_player(Player* player)
 
 	
 	// UI
-	short clr_mlpr = 2;
+	char clr_mlpr = 2;
 	if(player->is_taking_damage)
 	{
 		if(player->dmg_color.a < 127)
@@ -149,8 +159,9 @@ void draw_player(Player* player)
 	short tx_multiplier = player->is_facing_right ? -1 : 1;
 	
 	//SHADOW//
-	if(IS_SHADOWED)
-	DrawRectangle(pl_rec.x + SHADOW_OFFSET, pl_rec.y + SHADOW_OFFSET, pl_rec.width, pl_rec.height, SHADOW_COLOR);
+	if(IS_SHADOWED) {
+		DrawRectangle(pl_rec.x + SHADOW_OFFSET, pl_rec.y + SHADOW_OFFSET, pl_rec.width, pl_rec.height, SHADOW_COLOR);
+	}
 	//SHADOW//
 
 	DrawTexturePro(player->tex, (Rectangle){ .x = 0, .y = 0, .width = player->tex.width * tx_multiplier, .height = player->tex.height },

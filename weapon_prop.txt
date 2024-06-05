@@ -6,3 +6,12 @@ PISTOL:
     Shot break: 0.33f
     Bullet speed: 1000
     Bullet radius: 8
+
+MINIGUN:
+    Bullet count: 400
+    Max ammo: 200
+    Reload time: 10f
+    Damage: 2
+    Shot break: 0.02f
+    Bullet speed: 1000
+    Bullet radius: 8

@@ -23,13 +23,22 @@ Weapon* init_weapon(unsigned short type, Vector2 pos, const char* bullet_tex_pat
 	{
 		case PISTOL:
 			weapon->bullet_count = 32;
-			weapon->bullets = init_bullets(weapon->bullet_count, 1000, 8);
+			weapon->bullets = init_bullets(PISTOL_BULLET, weapon->bullet_count, 1000, 8);
 			weapon->max_ammo = 16;
 			weapon->reload_time = 2.5f;
 			weapon->damage = 10;
 			weapon->shot_break = 0.33f;
 			break;
 		
+		case MINIGUN:
+			weapon->bullet_count = 400;
+			weapon->bullets = init_bullets(PISTOL_BULLET, weapon->bullet_count, 1000, 8);
+			weapon->max_ammo = 200;
+			weapon->reload_time = 10.0f;
+			weapon->damage = 1;
+			weapon->shot_break = 0.1f;
+			break;
+
 		default:
 			break;
 	}
@@ -77,6 +86,7 @@ void update_weapon(Weapon* weapon)
 			if((IsKeyPressed(KEY_R) && weapon->cur_ammo != weapon->max_ammo))
 			{
 				weapon->is_reloading = true;
+				weapon->can_shoot = false;
 			}
 
 			// shoot ammo
@@ -97,9 +107,62 @@ void update_weapon(Weapon* weapon)
 			}
 			break;
 
-			default:
-				printf("Error weapon type: %d\n", weapon->type);
-				break;
+		case MINIGUN:
+			// reload ammo
+			if(weapon->is_reloading)
+			{
+				weapon->can_shoot = false;
+				weapon->shot_break_time_elapsed = 0;
+				if(weapon->cur_reload_time < weapon->reload_time)
+				{
+					weapon->cur_reload_time += GetFrameTime();
+					if(weapon->cur_reload_time > weapon->reload_time)
+					{
+						weapon->is_reloading = false;
+						weapon->can_shoot = true;
+						weapon->cur_ammo = weapon->max_ammo;
+						weapon->cur_reload_time = 0;
+					}
+				}
+			}
+			else if(!weapon->can_shoot)
+			{
+				weapon->shot_break_time_elapsed += GetFrameTime();
+				if(weapon->shot_break_time_elapsed >= weapon->shot_break)
+				{
+					weapon->can_shoot = true;
+					weapon->shot_break_time_elapsed = 0;
+					weapon->offset = 0;
+				}
+			}
+
+			// trigger reload
+			if((IsKeyPressed(KEY_R) && weapon->cur_ammo != weapon->max_ammo))
+			{
+				weapon->is_reloading = true;
+				weapon->can_shoot = false;
+			}
+
+			// shoot ammo
+			if(weapon->can_shoot && weapon->cur_ammo > 0 && IsMouseButtonDown(0))
+			{
+				weapon->can_shoot = false;
+				gamecamera->is_shaking = true;
+				for(int i = 0; i < weapon->bullet_count; i++)
+				{
+					if(weapon->bullets[i]->is_active) continue;
+						
+					weapon->bullets[i]->is_active = true;
+					weapon->bullets[i]->cir.center = weapon->cir.center;
+					weapon->bullets[i]->dir = weapon->dir;
+					weapon->cur_ammo--;
+					break;
+				}	
+			}
+			break;
+
+		default:
+			break;
 	}
 }
 

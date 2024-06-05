@@ -11,7 +11,7 @@ typedef struct
 	enum
 	{
 		PISTOL_BULLET,
-		PYROGUN_BULLET
+		LASER
 	} type;
 
 	Circle cir;
@@ -21,7 +21,7 @@ typedef struct
 	float time_to_alive;
 } Bullet;
 
-Bullet** init_bullets(unsigned int count, float speed, float radius);
+Bullet** init_bullets(int type, unsigned int count, float speed, float radius);
 void update_bullet(Bullet* bullet);
 void draw_bullet(Bullet* bullet, Texture2D tex);
 

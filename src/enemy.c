@@ -55,7 +55,7 @@ void draw_enemy(Enemy* enemy, Texture2D enemies_spsheet)
 {
 	short tx_multiplier = enemy->is_facing_right ? -1 : 1;
 
-	Color color = enemy->knockback_complete ? WHITE : RED;
+	Color color = enemy->knockback_complete ? WHITE : (Color){ 255, 0, 0, 255 };
 
 	DrawTexturePro(enemies_spsheet, (Rectangle){ .x = 32 * enemy->type, .y = 0, .width = 32 * tx_multiplier, .height = 32 },
 					get_enemy_rec(enemy), (Vector2){ 0 }, 0, color);
@@ -76,7 +76,39 @@ void draw_enemy_shadow(Enemy* enemy)
 	DrawRectangle(e_rec.x + SHADOW_OFFSET, e_rec.y + SHADOW_OFFSET, e_rec.width, e_rec.height, SHADOW_COLOR);
 }
 
+void rerow_enemies(Enemy*** list, unsigned int* count)
+{
+	int c = 0;
+    Enemy** result = malloc(sizeof(Enemy*) * (*count));
+    for(int i = 0; i < *count; i++)
+    {
+        if((*list)[i]->is_dead)
+        {
+            free((*list)[i]);
+            continue;
+        }
+        c++;
+        result = realloc(result, sizeof(Enemy*) * c);
+        result[c-1] = (*list)[i];
+    }
+    free(*list);
+    *count = c;
+    *list = result;
+}
+
+void add_enemy(Enemy* e, Enemy*** list, unsigned int* count)
+{
+    (*count)++;
+    *list = realloc(*list, *count * sizeof(Enemy*));
+    (*list)[*count-1] = e;
+}
+
 Rectangle get_enemy_rec(Enemy* enemy)
 {
 	return (Rectangle){ .x = enemy->pos.x, .y = enemy->pos.y, .width = enemy->size.x, .height = enemy->size.y };
+}
+
+Vector2 get_enemy_mid(Enemy* enemy)
+{
+	return vec2_sum(enemy->pos, vec2_div(enemy->size, 2));
 }

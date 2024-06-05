@@ -10,7 +10,7 @@ typedef struct
 	enum
 	{
 		PISTOL,
-		LASERGUN
+		MINIGUN,
 	} type;
 
 	Circle cir;

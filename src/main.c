@@ -6,16 +6,24 @@
 
 int main(int argc, char** argv)
 {
-	if(argc > 1)
-		IS_SHADOWED = !strcmp("--shadow", argv[1]);
-	if(argc > 2)
-		ENEMY_COUNT = str_to_int(argv[2]);
-	if(argc > 3)
-		WEAPON_COUNT = str_to_int(argv[3]);
+	
+	for(int i = 0; i < argc; i++)
+	{
+		if (strcmp("--no-shadow", argv[i]) == 0) {
+			IS_SHADOWED = false;
+		} else if (strcmp("-f", argv[i]) == 0) {
+			IS_FULLSCREEN = true;
+			WIDTH = 0;
+			HEIGHT = 0;
+		}
 
+	}
 	InitWindow(WIDTH, HEIGHT, TITLE);
+	if (IS_FULLSCREEN) {
+		ToggleFullscreen();
+		WIDTH = GetScreenWidth(), HEIGHT = GetScreenHeight();
+	}
 	SetTargetFPS(FPS);
-
 	init();
 	while(!WindowShouldClose())
 	{
