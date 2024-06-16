@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-Bullet** init_bullets(int type, unsigned int count, float speed, float radius)
+Bullet** init_bullets(int type, unsigned int count, float speed, float radius, float lifetime)
 {
 	Bullet** bullets = calloc(count, sizeof(Bullet*));
 
@@ -19,6 +19,7 @@ Bullet** init_bullets(int type, unsigned int count, float speed, float radius)
 		bullets[i]->speed = speed;
 		bullets[i]->dir = (Vector2){ 0, 0 };
 		bullets[i]->is_active = false;
+		bullets[i]->lifetime = lifetime;
 		bullets[i]->time_to_alive = 0;
 	}
 
@@ -33,7 +34,7 @@ void update_bullet(Bullet* bullet)
 			bullet->cir.center.y += bullet->dir.y * bullet->speed * GetFrameTime();
 			bullet->time_to_alive += GetFrameTime();
 
-			if(bullet->time_to_alive > BULLET_MAX_TIME)
+			if(bullet->time_to_alive > bullet->lifetime)
 			{
 				bullet->is_active = false;
 				bullet->time_to_alive = 0;

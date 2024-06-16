@@ -1,4 +1,5 @@
 #include "include/vutils.h"
+#include <stdlib.h>
 
 int str_to_int(const char* str)
 {
@@ -72,4 +73,14 @@ Vector2 vec2_sum(Vector2 a, Vector2 b)
 Vector2 vec2_div(Vector2 a, float divisor)
 {
 	return (Vector2){ a.x/divisor, a.y/divisor };
+}
+
+float random_val(float min, float max)
+{
+    // Generate a random float between 0 and 1
+    float random_0_1 = (float)rand() / RAND_MAX;
+
+    // Scale and shift the range to [min, max)
+    float range = max - min;
+    return min + random_0_1 * range;
 }

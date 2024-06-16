@@ -11,7 +11,16 @@ MINIGUN:
     Bullet count: 400
     Max ammo: 200
     Reload time: 10f
-    Damage: 2
-    Shot break: 0.02f
+    Damage: 1
+    Shot break: 0.1f
     Bullet speed: 1000
     Bullet radius: 8
+
+SHOTGUN:
+    Bullet count: 8
+    Max ammo: 4
+    Reload time: 3f
+    Damage: 30
+    Shot break: 0.5f
+    Bullet speed: 1000
+    Bullet radius: 16

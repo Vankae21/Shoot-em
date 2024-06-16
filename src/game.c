@@ -19,9 +19,9 @@ bool is_paused = false;
 
 unsigned int collected_coin = 0;
 unsigned int kill_count = 0;
-unsigned int ENEMY_COUNT = 3;
+unsigned int ENEMY_COUNT = 10;
 unsigned int COLLECTIBLE_COUNT = 0;
-unsigned int WEAPON_COUNT = 1;
+unsigned int WEAPON_COUNT = 3;
 
 Font font;
 
@@ -69,11 +69,10 @@ void init()
 	weapons = calloc(WEAPON_COUNT, sizeof(Weapon*));
 	for(int i = 0; i < WEAPON_COUNT; i++)
 	{
-		weapons[i] = init_weapon(PISTOL, (Vector2){ rand() % WIDTH, rand() % HEIGHT }, "assets/bullet.png");
+		weapons[i] = init_weapon(i, (Vector2){ 200 + i * 128, 400 }, "assets/bullet.png");
 	}
 
 	gamecamera = init_camera(player);
-	player->cur_wpn = weapons[0];
 }
 
 void update()

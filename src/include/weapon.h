@@ -5,12 +5,11 @@
 #include "vutils.h"
 #include <raylib.h>
 
-typedef struct
-{
-	enum
-	{
+typedef struct {
+	enum {
 		PISTOL,
 		MINIGUN,
+		SHOTGUN
 	} type;
 
 	Circle cir;
@@ -19,7 +18,7 @@ typedef struct
 	Bullet** bullets;
 	unsigned int bullet_count;
 	unsigned int max_ammo;
-	unsigned int cur_ammo;
+	int cur_ammo;
 	bool is_reloading;
 	float reload_time;
 	float cur_reload_time;
