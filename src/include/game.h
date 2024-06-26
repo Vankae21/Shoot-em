@@ -6,7 +6,7 @@
 
 #define TITLE "Shoot Those Mfs"
 #define FPS 60
-#define DEBUG 0
+#define DEBUG 1
 #define DEF_WIDTH 1280
 #define DEF_HEIGHT 720
 #define SIZE_MULTIPLIER 

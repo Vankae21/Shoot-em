@@ -4,6 +4,7 @@
 #include <raylib.h>
 #include <float.h>
 #include "include/game.h"
+#include "include/inventory.h"
 #include "include/vutils.h"
 #include "include/player.h"
 #include "include/weapon.h"
@@ -127,12 +128,23 @@ void update()
 
 	for(int w = 0; w < WEAPON_COUNT; w++)
 	{
-		if(!player->cur_wpn && is_rec_circle_colliding(get_player_rec(player), weapons[w]->cir))
+		if(is_rec_circle_colliding(get_player_rec(player), weapons[w]->cir))
 		{
 			if(IsKeyPressed(KEY_E))
 			{
-				weapons[w]->is_picked_up = true;
-				player->cur_wpn = weapons[w];
+				for (int i = 0; i < player->inventory->SLOT_COUNT; i++) {
+					if (player->inventory->slots[i]->is_empty) {
+						weapons[w]->is_in_inventory = true;
+						player->inventory->slots[i]->weapon = weapons[w];
+						player->inventory->slots[i]->is_empty = false;
+						if (!player->cur_wpn) {
+							player->inventory->cur_slot_i = i;
+							player->cur_wpn = player->inventory->slots[i]->weapon;
+							player->cur_wpn->is_selected = true;
+						}
+						break;
+					}
+				}
 			}
 		}
 		for(int i = 0; i < weapons[w]->bullet_count; i++)
@@ -308,6 +320,8 @@ void draw_ui()
 		DrawTextEx(font, wpn_text, (Vector2){ 256, 0 }, 64, 0, BLACK);
 	}
 
+	// INVENTORY
+	draw_inventory(player->inventory, (Vector2){ 640, 16 }, weapon_spsheet);
 }
 
 void finish()

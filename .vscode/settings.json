@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "float.h": "c",
-        "weapon.h": "c",
-        "vutils.h": "c",
-        "game.h": "c",
-        "player.h": "c"
-    }
-}

@@ -13,7 +13,8 @@ typedef struct {
 	} type;
 
 	Circle cir;
-	bool is_picked_up;
+	bool is_selected;
+	bool is_in_inventory;
 	Vector2 dir;
 	Bullet** bullets;
 	unsigned int bullet_count;

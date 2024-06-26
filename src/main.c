@@ -13,6 +13,7 @@ int main(int argc, char** argv)
 			IS_SHADOWED = false;
 		} else if (strcmp("-f", argv[i]) == 0) {
 			IS_FULLSCREEN = true;
+			// make fullscreen			
 			WIDTH = 0;
 			HEIGHT = 0;
 		}
@@ -23,6 +24,8 @@ int main(int argc, char** argv)
 		ToggleFullscreen();
 		WIDTH = GetScreenWidth(), HEIGHT = GetScreenHeight();
 	}
+	// Don't exit when esc pressed
+	SetExitKey(0);
 	SetTargetFPS(FPS);
 	init();
 	while(!WindowShouldClose())

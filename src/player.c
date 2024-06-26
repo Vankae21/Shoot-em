@@ -21,6 +21,7 @@ Player* init_player(Vector2 pos, Vector2 size, float speed, float max_hp, const 
 	player->sprite_order = 1;
 	player->tex = LoadTexture(tex_path);
 	player->is_taking_damage = false;
+	player->inventory = init_inventory(/*SLOT COUNT--->*/ 5);
 
 	// VISUAL
 
@@ -50,8 +51,24 @@ void update_player(Player* player, Vector2 max_frame)
 	}
 
 	float move_speed_divisor = 1;
-	if(player->cur_wpn)
-	{
+
+	// select inventory slot
+	int key = GetKeyPressed();
+	if (key >= KEY_ONE && key <= KEY_NINE) {
+		int slot_index = key - 48;
+		printf("%d\n", slot_index);
+		if (slot_index < player->inventory->SLOT_COUNT) {
+			if (player->cur_wpn)
+				player->cur_wpn->is_selected = false;
+
+			player->cur_wpn = player->inventory->slots[slot_index - 1]->weapon;
+			player->inventory->cur_slot_i = slot_index - 1;
+			
+			if (player->cur_wpn)
+				player->cur_wpn->is_selected = true;
+		}
+	}
+	if (player->cur_wpn) {
 		Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), *(gamecamera->camera));
 		Vector2 pointer = { .x = mousePos.x - player->pos.x - player->size.x/2, .y = mousePos.y - player->pos.y - player->size.y/2 };
 		Vector2 pointer_dir = vec2_normalize(pointer);
@@ -64,6 +81,9 @@ void update_player(Player* player, Vector2 max_frame)
 		{
 			player->is_facing_right = false;
 		}
+
+		// WEAPON
+
 		player->cur_wpn->dir = pointer_dir;
 		if(!player->cur_wpn->can_shoot)
 		{
@@ -93,10 +113,13 @@ void update_player(Player* player, Vector2 max_frame)
 
 		if(IsKeyPressed(KEY_Q))
 		{
-			player->cur_wpn->is_picked_up = false;
+			player->cur_wpn->is_selected = false;
+			player->cur_wpn->is_in_inventory = false;
 			player->cur_wpn->cur_reload_time = 0;
 			player->cur_wpn->is_reloading = false;
 			player->cur_wpn->dir = (Vector2){ 0 };
+			player->inventory->slots[player->inventory->cur_slot_i]->is_empty = true;
+			player->inventory->slots[player->inventory->cur_slot_i]->weapon = (void*)0;
 			player->cur_wpn = (void*)0;
 		}
 	

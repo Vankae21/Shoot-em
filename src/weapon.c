@@ -12,7 +12,8 @@ Weapon* init_weapon(unsigned short type, Vector2 pos, const char* bullet_tex_pat
 
 	// defaults
 	weapon->type = type;
-	weapon->is_picked_up = false;
+	weapon->is_selected = false;
+	weapon->is_in_inventory = false;
 	weapon->cir = (Circle){ .center = pos, .radius = 16 };
 	weapon->dir = (Vector2){ 0, 0 };
 	weapon->is_reloading = false;
@@ -251,6 +252,8 @@ void update_weapon(Weapon* weapon)
 
 void draw_weapon(Weapon* weapon, Texture2D weapon_spsheet)
 {
+	if (weapon->is_in_inventory && !weapon->is_selected) return;
+
 	if (DEBUG) {
 		DrawCircleV(weapon->cir.center, weapon->cir.radius, BROWN);		
 	}

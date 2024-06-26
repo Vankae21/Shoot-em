@@ -1,6 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "inventory.h"
 #include "weapon.h"
 #include <raylib.h>
 
@@ -17,6 +18,7 @@ typedef struct
 	int sprite_order;
 	Texture2D tex;
 	bool is_taking_damage;
+	Inventory* inventory;
 
 	// VISUAL
 
