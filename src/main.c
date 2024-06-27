@@ -1,5 +1,6 @@
 #include <raylib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "include/game.h"
 #include "include/vutils.h"
@@ -16,6 +17,8 @@ int main(int argc, char** argv)
 			// make fullscreen			
 			WIDTH = 0;
 			HEIGHT = 0;
+		} else {
+			ENEMY_COUNT = atoi(argv[i]);
 		}
 
 	}

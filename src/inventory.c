@@ -1,4 +1,5 @@
 #include "include/inventory.h"
+#include <raylib.h>
 #include <stdlib.h>
 
 // SLOT
@@ -8,6 +9,7 @@ Slot* init_slot(int index)
 
 	slot->index = index;
 	slot->is_empty = true;
+	slot->is_selected = index == 0 ? true : false;
 	slot->weapon = (void*)0;
 
 	return slot;
@@ -16,7 +18,7 @@ Slot* init_slot(int index)
 void draw_slot(Slot* slot, Vector2 pos, Texture2D weapon_spsheet)
 {
 	DrawRectangle(pos.x, pos.y, SLOT_SIZE, SLOT_SIZE, RAYWHITE);
-	DrawRectangleLines(pos.x, pos.y, SLOT_SIZE, SLOT_SIZE, BLACK);
+	DrawRectangleLinesEx((Rectangle){ pos.x, pos.y, SLOT_SIZE, SLOT_SIZE }, 4, slot->is_selected ? RED : BLACK);
 
 	if (slot->is_empty) return;
 

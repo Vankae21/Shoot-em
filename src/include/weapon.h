@@ -29,6 +29,7 @@ typedef struct {
 	float shot_break_time_elapsed;
 	bool can_shoot;
 	float offset;
+	float shot_offset;
 } Weapon;
 
 Weapon* init_weapon(unsigned short type, Vector2 pos, const char* bullet_tex_path);

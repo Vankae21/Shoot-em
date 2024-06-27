@@ -21,6 +21,8 @@ Weapon* init_weapon(unsigned short type, Vector2 pos, const char* bullet_tex_pat
 	weapon->shot_break_time_elapsed = 0;
 	weapon->can_shoot = true;
 	weapon->offset = 0;
+	weapon->shot_offset = 0;
+
 	switch(type)
 	{
 		case PISTOL:
@@ -30,6 +32,7 @@ Weapon* init_weapon(unsigned short type, Vector2 pos, const char* bullet_tex_pat
 			weapon->reload_time = 2.5f;
 			weapon->damage = 10;
 			weapon->shot_break = 0.33f;
+		//	weapon->shot_offset = 0;
 			break;
 		
 		case MINIGUN:
@@ -39,6 +42,7 @@ Weapon* init_weapon(unsigned short type, Vector2 pos, const char* bullet_tex_pat
 			weapon->reload_time = 10.0f;
 			weapon->damage = 1;
 			weapon->shot_break = 0.1f;
+			weapon->shot_offset = 32;
 			break;
 
 		case SHOTGUN:
@@ -59,6 +63,7 @@ Weapon* init_weapon(unsigned short type, Vector2 pos, const char* bullet_tex_pat
 			weapon->reload_time = 3.0f;
 			weapon->damage = 30;
 			weapon->shot_break = 0.5f;
+			weapon->shot_offset = 32;
 			break;
 
 		default:
@@ -121,7 +126,8 @@ void update_weapon(Weapon* weapon)
 					if(weapon->bullets[i]->is_active) continue;
 						
 					weapon->bullets[i]->is_active = true;
-					weapon->bullets[i]->cir.center = weapon->cir.center;
+					weapon->bullets[i]->cir.center = (Vector2){ .x = weapon->cir.center.x + weapon->shot_offset * weapon->dir.x,
+																.y = weapon->cir.center.y + weapon->shot_offset * weapon->dir.y };
 					weapon->bullets[i]->dir = weapon->dir;
 					weapon->cur_ammo--;
 					break;
@@ -175,7 +181,8 @@ void update_weapon(Weapon* weapon)
 					if(weapon->bullets[i]->is_active) continue;
 						
 					weapon->bullets[i]->is_active = true;
-					weapon->bullets[i]->cir.center = weapon->cir.center;
+					weapon->bullets[i]->cir.center = (Vector2){ .x = weapon->cir.center.x + weapon->shot_offset * weapon->dir.x,
+																.y = weapon->cir.center.y + weapon->shot_offset * weapon->dir.y };
 					weapon->bullets[i]->dir = weapon->dir;
 					weapon->cur_ammo--;
 					break;
@@ -234,7 +241,8 @@ void update_weapon(Weapon* weapon)
 					}
 
 					weapon->bullets[i]->is_active = true;
-					weapon->bullets[i]->cir.center = weapon->cir.center;
+					weapon->bullets[i]->cir.center = (Vector2){ .x = weapon->cir.center.x + weapon->shot_offset * weapon->dir.x,
+																.y = weapon->cir.center.y + weapon->shot_offset * weapon->dir.y };
 					// randomize directions
 					float dir_limit = .2f;
 					Vector2 randomized_dir = {random_val(weapon->dir.x - dir_limit, weapon->dir.x + dir_limit),

@@ -36,5 +36,8 @@ Player* init_player(Vector2 pos, Vector2 size, float speed, float max_hp, const 
 void update_player(Player* player, Vector2 max_frame);
 void draw_player(Player* player);
 Rectangle get_player_rec(Player* player);
+void add_to_inventory(Player* player, Weapon* weapon);
+void remove_from_inventory(Player* player);
+void change_slot(Player* player);
 
 #endif

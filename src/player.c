@@ -1,5 +1,6 @@
 #include "include/player.h"
 #include "include/game.h"
+#include "include/inventory.h"
 #include "include/vutils.h"
 #include "include/weapon.h"
 #include <raylib.h>
@@ -52,22 +53,9 @@ void update_player(Player* player, Vector2 max_frame)
 
 	float move_speed_divisor = 1;
 
-	// select inventory slot
-	int key = GetKeyPressed();
-	if (key >= KEY_ONE && key <= KEY_NINE) {
-		int slot_index = key - 48;
-		printf("%d\n", slot_index);
-		if (slot_index < player->inventory->SLOT_COUNT) {
-			if (player->cur_wpn)
-				player->cur_wpn->is_selected = false;
+	// CHANGE INVENTORY SLOT //----------
+	change_slot(player);
 
-			player->cur_wpn = player->inventory->slots[slot_index - 1]->weapon;
-			player->inventory->cur_slot_i = slot_index - 1;
-			
-			if (player->cur_wpn)
-				player->cur_wpn->is_selected = true;
-		}
-	}
 	if (player->cur_wpn) {
 		Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), *(gamecamera->camera));
 		Vector2 pointer = { .x = mousePos.x - player->pos.x - player->size.x/2, .y = mousePos.y - player->pos.y - player->size.y/2 };
@@ -113,14 +101,7 @@ void update_player(Player* player, Vector2 max_frame)
 
 		if(IsKeyPressed(KEY_Q))
 		{
-			player->cur_wpn->is_selected = false;
-			player->cur_wpn->is_in_inventory = false;
-			player->cur_wpn->cur_reload_time = 0;
-			player->cur_wpn->is_reloading = false;
-			player->cur_wpn->dir = (Vector2){ 0 };
-			player->inventory->slots[player->inventory->cur_slot_i]->is_empty = true;
-			player->inventory->slots[player->inventory->cur_slot_i]->weapon = (void*)0;
-			player->cur_wpn = (void*)0;
+			remove_from_inventory(player);
 		}
 	
 	}
@@ -194,4 +175,86 @@ void draw_player(Player* player)
 Rectangle get_player_rec(Player* player)
 {
 	return (Rectangle){ .x = player->pos.x, .y = player->pos.y, .width = player->size.x, .height = player->size.y };
+}
+
+void add_to_inventory(Player* player, Weapon* weapon)
+{
+	if (weapon->is_in_inventory) return;
+	if (player->inventory->slots[player->inventory->cur_slot_i]->is_empty) {
+		int i = player->inventory->cur_slot_i;
+		weapon->is_in_inventory = true;
+		player->inventory->slots[i]->is_empty = false;
+		player->inventory->slots[i]->weapon = weapon;
+		player->cur_wpn = weapon;
+		weapon->is_selected = true;
+		return;
+	}
+	for (int i = 0; i < player->inventory->SLOT_COUNT; i++) {
+		if (player->inventory->slots[i]->is_empty) {
+			weapon->is_in_inventory = true;
+			player->inventory->slots[i]->weapon = weapon;
+			player->inventory->slots[i]->is_empty = false;
+			return;
+		}
+	}
+}
+
+void remove_from_inventory(Player* player)
+{
+	player->cur_wpn->is_selected = false;
+	player->cur_wpn->is_in_inventory = false;
+	player->cur_wpn->cur_reload_time = 0;
+	player->cur_wpn->is_reloading = false;
+	player->cur_wpn->dir = (Vector2){ 0 };
+	player->inventory->slots[player->inventory->cur_slot_i]->is_empty = true;
+	player->inventory->slots[player->inventory->cur_slot_i]->weapon = (void*)0;
+	player->cur_wpn = (void*)0;
+}
+
+void change_slot(Player* player)
+{
+	// select inventory slot
+	int key = GetKeyPressed();
+	if (key >= KEY_ONE && key <= KEY_NINE) {
+		int slot_index = key - 48 - /*FOR INDEXING -->*/1;
+	//	printf("%d\n", slot_index);
+		if (slot_index < player->inventory->SLOT_COUNT) {
+			if (player->cur_wpn)
+				player->cur_wpn->is_selected = false;
+
+			player->cur_wpn = player->inventory->slots[slot_index]->weapon;
+	// ASSIGN PREVIOUS SELECTED SLOT TO UNSELECTED
+			player->inventory->slots[player->inventory->cur_slot_i]->is_selected = false;			
+	// ASSIGN is_selected TO TRUE FOR CURRENT SLOT
+			player->inventory->cur_slot_i = slot_index;
+			player->inventory->slots[slot_index]->is_selected = true;
+			
+			if (player->cur_wpn)
+				player->cur_wpn->is_selected = true;
+		}
+	}
+
+	int delta_mouse = (int)GetMouseWheelMove();
+	if (delta_mouse == 0) return;
+
+	if (player->cur_wpn)
+		player->cur_wpn->is_selected = false;
+
+	int i = player->inventory->cur_slot_i;
+	int slot_index = i + delta_mouse;
+	if (slot_index > player->inventory->SLOT_COUNT - 1) {
+		slot_index = 0;
+	} else if (slot_index < 0) {
+		slot_index = player->inventory->SLOT_COUNT - 1;
+	}
+
+	player->cur_wpn = player->inventory->slots[slot_index]->weapon;
+// ASSIGN PREVIOUS SELECTED SLOT TO UNSELECTED
+	player->inventory->slots[player->inventory->cur_slot_i]->is_selected = false;			
+// ASSIGN is_selected TO TRUE FOR CURRENT SLOT
+	player->inventory->cur_slot_i = slot_index;
+	player->inventory->slots[slot_index]->is_selected = true;
+			
+	if (player->cur_wpn)
+		player->cur_wpn->is_selected = true;
 }

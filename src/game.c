@@ -18,9 +18,11 @@ bool IS_FULLSCREEN = false;
 bool IS_SHADOWED = true;
 bool is_paused = false;
 
+//float SIZE_MULTIPLIER = (float)WIDTH/(float)1280;
+
 unsigned int collected_coin = 0;
 unsigned int kill_count = 0;
-unsigned int ENEMY_COUNT = 10;
+unsigned int ENEMY_COUNT = 0;
 unsigned int COLLECTIBLE_COUNT = 0;
 unsigned int WEAPON_COUNT = 3;
 
@@ -71,6 +73,7 @@ void init()
 	for(int i = 0; i < WEAPON_COUNT; i++)
 	{
 		weapons[i] = init_weapon(i, (Vector2){ 200 + i * 128, 400 }, "assets/bullet.png");
+		add_to_inventory(player, weapons[i]);
 	}
 
 	gamecamera = init_camera(player);
@@ -86,7 +89,6 @@ void update()
 
 	Vector2 max_frame = { bg_rec.width, bg_rec.height };
 
-	gamecamera->camera->zoom += GetMouseWheelMove() * GetFrameTime();
 	update_player(player, max_frame);
 	Vector2 player_dest = vec2_sum(player->pos, vec2_div(player->size, 2));
 
@@ -126,25 +128,15 @@ void update()
 		}
 	}
 
+	bool weapon_taken = false;
 	for(int w = 0; w < WEAPON_COUNT; w++)
 	{
-		if(is_rec_circle_colliding(get_player_rec(player), weapons[w]->cir))
+		if(is_rec_circle_colliding(get_player_rec(player), weapons[w]->cir) && !weapon_taken)
 		{
 			if(IsKeyPressed(KEY_E))
 			{
-				for (int i = 0; i < player->inventory->SLOT_COUNT; i++) {
-					if (player->inventory->slots[i]->is_empty) {
-						weapons[w]->is_in_inventory = true;
-						player->inventory->slots[i]->weapon = weapons[w];
-						player->inventory->slots[i]->is_empty = false;
-						if (!player->cur_wpn) {
-							player->inventory->cur_slot_i = i;
-							player->cur_wpn = player->inventory->slots[i]->weapon;
-							player->cur_wpn->is_selected = true;
-						}
-						break;
-					}
-				}
+				add_to_inventory(player, weapons[w]);
+				weapon_taken = true;
 			}
 		}
 		for(int i = 0; i < weapons[w]->bullet_count; i++)
@@ -297,9 +289,10 @@ void draw_ui()
 	//hpbar source rec green
 	Rectangle pl_hp_bar_green = { .x = 0, .y = 32, .width = player->cur_hp / player->max_hp * 192, .height = 32 };
 	//hpbar pos rec red
-	Rectangle pl_hp_bar_red_dest = { .x = 16, .y = 16, .width = 192, .height = 32 };
+	Rectangle pl_hp_bar_red_dest = { .x = 16, .y = 16, .width = 192 * SIZE_MULTIPLIER, .height = 32 * SIZE_MULTIPLIER };
 	//hpbar pos rec green
-	Rectangle pl_hp_bar_green_dest = { .x = 16, .y = 16, .width = player->cur_hp / player->max_hp * 192, .height = 32 };
+	Rectangle pl_hp_bar_green_dest = { .x = 16, .y = 16, .width = (player->cur_hp / player->max_hp * 192) * SIZE_MULTIPLIER,
+														 .height = 32 * SIZE_MULTIPLIER };
 	//red hp bar
 	DrawTexturePro(hpbar_spsheet, pl_hp_bar_red, pl_hp_bar_red_dest, (Vector2){0}, 0, WHITE);
 	//green hp bar

@@ -9,6 +9,7 @@
 typedef struct {
 	int index;
 	bool is_empty;
+	bool is_selected;
 	Weapon* weapon;
 } Slot;
 
