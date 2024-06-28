@@ -18,15 +18,18 @@ bool IS_FULLSCREEN = false;
 bool IS_SHADOWED = true;
 bool is_paused = false;
 
-//float SIZE_MULTIPLIER = (float)WIDTH/(float)1280;
+// SOUNDS
+Sound music_game;
 
+// FONT
+Font font;
+
+// GAME DATA
 unsigned int collected_coin = 0;
 unsigned int kill_count = 0;
 unsigned int ENEMY_COUNT = 0;
 unsigned int COLLECTIBLE_COUNT = 0;
 unsigned int WEAPON_COUNT = 3;
-
-Font font;
 
 // BACKGROUND
 Texture2D bg;
@@ -77,15 +80,24 @@ void init()
 	}
 
 	gamecamera = init_camera(player);
+
+	
+
+	// SOUNDS ------------------------
+	music_game = LoadSound("assets/music2.wav");
+//	PlaySound(music_game);
+	//--------------------------------
 }
 
 void update()
-{	
-	if(IsKeyPressed(KEY_P))
-	{
+{
+	// SOUNDS ------------------------
+//	if (!IsSoundPlaying(music_game)) PlaySound(music_game);
+	//--------------------------------
+	if (IsKeyPressed(KEY_SPACE)) {
 		is_paused = is_paused ? 0 : 1;
 	}
-	if(is_paused) return;
+	if (is_paused) return;
 
 	Vector2 max_frame = { bg_rec.width, bg_rec.height };
 

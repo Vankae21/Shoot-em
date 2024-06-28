@@ -39,5 +39,6 @@ Rectangle get_player_rec(Player* player);
 void add_to_inventory(Player* player, Weapon* weapon);
 void remove_from_inventory(Player* player);
 void change_slot(Player* player);
+void change_weapon(Player* player, int index);
 
 #endif

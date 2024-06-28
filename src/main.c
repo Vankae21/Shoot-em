@@ -23,6 +23,7 @@ int main(int argc, char** argv)
 
 	}
 	InitWindow(WIDTH, HEIGHT, TITLE);
+	InitAudioDevice();
 	if (IS_FULLSCREEN) {
 		ToggleFullscreen();
 		WIDTH = GetScreenWidth(), HEIGHT = GetScreenHeight();
@@ -41,6 +42,7 @@ int main(int argc, char** argv)
 		EndDrawing();
 	}
 
+	CloseAudioDevice();
 	CloseWindow();
 	finish();
 

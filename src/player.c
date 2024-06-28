@@ -139,7 +139,7 @@ void update_player(Player* player, Vector2 max_frame)
 	}
 
 	
-
+	// SQUEEZE PLAYER-------------------------------
 	player->height_dif = sinf(player->sqz_time_elapsed) * player->height_dif_mltp;
 	player->sqz_time_elapsed += GetFrameTime() * player->height_dif_freq;
 
@@ -219,26 +219,12 @@ void change_slot(Player* player)
 		int slot_index = key - 48 - /*FOR INDEXING -->*/1;
 	//	printf("%d\n", slot_index);
 		if (slot_index < player->inventory->SLOT_COUNT) {
-			if (player->cur_wpn)
-				player->cur_wpn->is_selected = false;
-
-			player->cur_wpn = player->inventory->slots[slot_index]->weapon;
-	// ASSIGN PREVIOUS SELECTED SLOT TO UNSELECTED
-			player->inventory->slots[player->inventory->cur_slot_i]->is_selected = false;			
-	// ASSIGN is_selected TO TRUE FOR CURRENT SLOT
-			player->inventory->cur_slot_i = slot_index;
-			player->inventory->slots[slot_index]->is_selected = true;
-			
-			if (player->cur_wpn)
-				player->cur_wpn->is_selected = true;
+			change_weapon(player, slot_index);
 		}
 	}
 
 	int delta_mouse = (int)GetMouseWheelMove();
 	if (delta_mouse == 0) return;
-
-	if (player->cur_wpn)
-		player->cur_wpn->is_selected = false;
 
 	int i = player->inventory->cur_slot_i;
 	int slot_index = i + delta_mouse;
@@ -247,14 +233,29 @@ void change_slot(Player* player)
 	} else if (slot_index < 0) {
 		slot_index = player->inventory->SLOT_COUNT - 1;
 	}
+	change_weapon(player, slot_index);
+}
 
-	player->cur_wpn = player->inventory->slots[slot_index]->weapon;
+void change_weapon(Player* player, int index)
+{
+	if (player->cur_wpn && player->cur_wpn == player->inventory->slots[index]->weapon) return;
+
+// ASSIGN is_selected TO FALSE FOR PREVIOUS WEAPON
+	if (player->cur_wpn) {		
+	// RESET CURRENT WEAPON
+		player->cur_wpn->cur_reload_time = 0;
+		player->cur_wpn->is_reloading = false;
+		player->cur_wpn->dir = (Vector2){ 0 };
+		player->cur_wpn->is_selected = false;
+	}
+
+	player->cur_wpn = player->inventory->slots[index]->weapon;
 // ASSIGN PREVIOUS SELECTED SLOT TO UNSELECTED
 	player->inventory->slots[player->inventory->cur_slot_i]->is_selected = false;			
 // ASSIGN is_selected TO TRUE FOR CURRENT SLOT
-	player->inventory->cur_slot_i = slot_index;
-	player->inventory->slots[slot_index]->is_selected = true;
-			
+	player->inventory->cur_slot_i = index;
+	player->inventory->slots[index]->is_selected = true;
+
 	if (player->cur_wpn)
 		player->cur_wpn->is_selected = true;
 }
